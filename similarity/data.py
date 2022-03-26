@@ -20,7 +20,7 @@ def get_courses():
 			(
 				doc.id, # CSCE 110
 				doc_dict['Course Name'], # Programming I
-				doc_dict['Course Credit Hours (l)'] # 4
+				doc_dict['Course Credit Hours (l)'], # 4
 				doc_dict['Course Description']
 			)
 		)

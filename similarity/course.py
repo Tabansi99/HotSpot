@@ -1,21 +1,23 @@
-from textblob import TextBlob
 
 class Course(object):
-	def __init__(self, title: str, desc: str, cap: int, enroll: int):
-		self.title = title 
+	def __init__(self, title: str, name: str, hours: int, desc: str):
+		self.title = title
+		self.name = name
+		self.full = f'{self.title}: {self.name}' 
+		self.hours = hours
 		self.desc = desc
-		self.cap = cap
-		self.enroll = enroll
 
-		major, number = self.title.split(' ')
-		self.number = int(number)
+		self.major, self.number = self._parse_title(title)
 		self.rank = int(self.number//100)
 
-		self.set_grams(self.desc)
+	def _parse_title(self, title):
+		major, number = title.split(' ')
+		return major, int(number)
 
-	def set_grams(desc):
-		self._blob = TextBlob(self.desc)
+	def __str__(self):
+		return self.full
 
-		self.unigrams = self._blob.ngrams(n=1)
-		self.bigrams = self._blob.ngrams(n=2)
-		self.trigrams = self._blob.ngrams(n=3)
+	def __eq__(self, other):
+		if isinstance(other, Course):
+			return self.title == other.title
+		return False

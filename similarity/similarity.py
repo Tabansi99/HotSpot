@@ -1,2 +1,7 @@
-from course import Course
-from data import get_courses
+
+
+def compute_sim(c1, c2):
+	pass
+
+def corpus_matrix(corpus):
+	pass
