@@ -1,7 +1,10 @@
 import { Search2Icon } from '@chakra-ui/icons';
-import { Box, Button, CSSReset, Flex, FormControl, FormLabel, Input, InputGroup, InputLeftAddon, InputLeftElement, Select, Stack, Text } from '@chakra-ui/react';
-import React from 'react';
+import { Box, Button, Center, CSSReset, Flex, FormControl, FormLabel, Input, InputGroup, InputLeftAddon, InputLeftElement, Select, Stack, Text } from '@chakra-ui/react';
+import { MdUploadFile } from "react-icons/md";
+import React, { useState } from 'react';
 import Layout from '../components/Layout'
+import FormData from 'form-data';
+import { sampleCourses } from '../utils/courses';
 
 const IndexPage = () => {
   return (
@@ -20,21 +23,57 @@ const IndexPage = () => {
 };
 
 const ClassForm = () => {
+  const [selectedFile, setSelectedFile] = useState<File>();
+  const [fileName, setFileName] = useState('No file chosen');
+  const [course, setCourse] = useState('');
+  const [major, setMajor] = useState('');
+  //const formData = new FormData();
 
   function validateForm(event: React.SyntheticEvent) {
+    sampleCourses.push(course);
+    
+    //formData.append('file', selectedFile);
 
+    fetch(
+      '/api/recommendation',
+      {
+        method: 'POST',
+        body: JSON.stringify({
+          course: course,
+          major: major
+        }),
+        redirect: "follow"
+      }
+    )
+      .then((res) => res.json())
+      .then((res) => {
+        console.log('Success: ', res)
+      })
+      .catch((err) => {
+        console.log('Error: ', err);
+      })
   }
 
   return (
     <Box>
-      <form action='/api/recommendation' onSubmit={validateForm} method="post">
+      <form onSubmit={validateForm}>
         <Stack>
           <FormControl id="major">
             <FormLabel>What's your major?</FormLabel>
             <InputGroup color={"#660000"} variant='unstyled'>
               <InputLeftAddon pointerEvents='none' children = {<Search2Icon />} />
               <p>&emsp;</p>
-              <Select focusBorderColor="#660000" borderColor={'black'} name='transcript' variant='flushed' placeholder='Select Major' required>
+              <Select
+                focusBorderColor="#660000"
+                borderColor={'black'}
+                name='major'
+                variant='flushed'
+                placeholder='Select Major'
+                onChange={(event) => {
+                  setMajor(event.target.value);
+                }}
+                required
+              >
                 <option value='Aerospace Engineering'>Aerospace Engineering</option>
                 <option value='Architectural Engineering'>Architectural Engineering</option>
                 <option value='Biomedical Engineering'>Biomedical Engineering</option>
@@ -63,12 +102,48 @@ const ClassForm = () => {
             <InputGroup color={"#660000"} variant='unstyled'>
               <InputLeftAddon pointerEvents='none' children = {<Search2Icon />} />
               <p>&emsp;</p>
-              <Input focusBorderColor="#660000" _placeholder={{color: '#A17C73'}} borderColor={'black'} name='class' type="text" color={"#660000"} variant='flushed' placeholder='ex. CSCE 121' required />
+              <Input
+                focusBorderColor="#660000"
+                _placeholder={{color: '#A17C73'}}
+                borderColor={'black'}
+                name='class'
+                type="text"
+                color={"#660000"}
+                variant='flushed'
+                placeholder='ex. CSCE 121'
+                onChange={(event) => {
+                  setCourse(event.target.value);
+                }}
+                required
+              />
             </InputGroup>
           </FormControl>
           <FormControl borderRadius={0} id="transcript">
-            <FormLabel>Upload unofficial transcript</FormLabel>
-            <Input name='major' type="file" variant='unstyled' p={2}placeholder='Select Major' required />
+            <FormLabel> Upload unofficial transcript </FormLabel>
+            <FormLabel>
+              <Text display={'-webkit-inline-flex'} >
+                <MdUploadFile size={40} />
+                <p>&emsp;</p>
+                <Center>
+                  {fileName}
+                </Center>
+              </Text>
+            </FormLabel>
+            <Input 
+              name='transcript'
+              display={'none'}
+              type="file"
+              variant='unstyled'
+              p={2}
+              onChange={
+                (event) => {
+                  const name = event.target.value;
+                  setFileName(name.split(/(\\|\/)/g).pop());
+                  setSelectedFile(event.target.files[0]);
+                }
+              }
+              required
+            />
           </FormControl>
           <Stack spacing={10}>
             <Button
@@ -80,6 +155,7 @@ const ClassForm = () => {
               }}
               width="full"
               mt={4}
+              p={5}
               borderColor={'black'}
               borderWidth='thick'
               borderRadius={15}

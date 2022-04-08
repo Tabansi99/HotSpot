@@ -1,0 +1,1 @@
+export const sampleCourses = ['CSCE_647', 'CSCE_634']
