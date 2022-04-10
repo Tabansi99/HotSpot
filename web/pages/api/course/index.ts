@@ -2,6 +2,8 @@ import { collection, doc, getDocs } from 'firebase/firestore';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { db } from '../../../firebase/clientApp';
 
+console.log('Entered');
+
 const handler = async (_req: NextApiRequest , res: NextApiResponse) => {
   const courseDB = collection(db, 'Courses');
   const coursesSnapShot = await getDocs(courseDB);

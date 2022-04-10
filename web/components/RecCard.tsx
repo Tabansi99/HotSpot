@@ -1,15 +1,18 @@
-import { Box, Badge, Button, Link, Text, Progress, HStack } from '@chakra-ui/react';
+import { CheckCircleIcon, CheckIcon } from '@chakra-ui/icons';
+import { Box, Button, Icon, Link, Text } from '@chakra-ui/react';
 import { useState } from 'react';
 import { ProgressBar } from 'react-bootstrap'
+import { RiCloseCircleFill } from "react-icons/ri";
 
 import ReadMore from './ReadMore';
 
-export interface Course {
+export interface RecCourse {
   course: String;
   courseName: String;
   courseDescription: String;
   sections: Sections[];
   credit: number;
+  feedback: (res: string) => void;
 }
 
 export interface Sections {
@@ -32,16 +35,21 @@ export interface Professor {
   Q: number;
 }
 
-export const CourseCard = ({
+export const RecommendationCard = ({
   course,
   courseName,
   courseDescription,
   sections,
-  credit
-}: Course) => {
-  const [isClicked, setIsClicked] = useState(false);
+  credit,
+  feedback
+}: RecCourse,
+) => {
+  //const [isClicked, setIsClicked] = useState(false);
 
   const more = sections.slice(1);
+  // console.log(course);
+  // console.log(sections.length);
+  // console.log('----------------------------------------------');
 
   function gradePercent(grade: number, dist: Professor) {
     const total = dist.A + dist.B + dist.C + dist.D + dist.F + dist.Q;
@@ -51,7 +59,7 @@ export const CourseCard = ({
 
   return (
     <Box textAlign={'left'} background="white" w={"sm"} borderWidth="1px" borderRadius="3xl" overflow="hidden" shadow={"xl"}>
-      <Box p={4}>
+      <Box p={4} pb={0}>
         <Text color={"#660000"} fontSize="4xl" as="h1" fontWeight="bold" textAlign={'center'}>
           {course}
         </Text>
@@ -113,8 +121,14 @@ export const CourseCard = ({
           <Text color={"#660000"} as="b" display="inline-block"> Credits: </Text> {credit}
         </Text>
 
-        { sections.length > 0 ?
-          <Box pt={2} textAlign={'center'}>
+        <Text fontWeight="bold">
+          <Text color={"#660000"} as="b" display="inline-block"> Is this recommendation helpful? </Text> &ensp;
+          <Link borderRadius='100'><CheckCircleIcon boxSize={'8'} onClick={() => {feedback('positive')}}/></Link> &ensp;
+          <Link borderRadius='100'><Icon as={RiCloseCircleFill} boxSize={'10'} onClick={() => {feedback('negative')}}/></Link>
+        </Text>
+      </Box>
+      { sections.length > 0 ?
+          <Box p={4} pt={0} textAlign={'center'}>
             <Link
               target="_blank"
               style={{ textDecoration: 'none' }}
@@ -137,7 +151,7 @@ export const CourseCard = ({
               </Button>
             </Link>
           </Box> :
-          <Box pt={2} textAlign={'center'}>
+          <Box p={4} pt={0} textAlign={'center'}>
             <Link
               target="_blank"
               style={{ textDecoration: 'none' }}
@@ -162,8 +176,6 @@ export const CourseCard = ({
             </Link>
           </Box>
         }
-        
-      </Box>
     </Box>
   );
 };

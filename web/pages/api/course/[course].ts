@@ -40,8 +40,8 @@ const handler = async (req: NextApiRequest , res: NextApiResponse) => {
     });
   });
 
-  const courseRes = Object.fromEntries(courseMap);
-  const response = courseRes[String(course)];
+  const courses = Object.fromEntries(courseMap);
+  const response = courses[String(course)];
 
   if (response) {
     res.send(response);
