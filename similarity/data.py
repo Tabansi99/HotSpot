@@ -7,7 +7,7 @@ firebase_admin.initialize_app(cred)
 
 db = firestore.client()
 
-def get_courses():
+def get_courses(course_name: str):
 	# Read data
 	courses_ref = db.collection(u'Courses')
 	docs = courses_ref.stream()
@@ -27,3 +27,6 @@ def get_courses():
 
 	# [(ID, Name, Credit Hours, Description), ... ]
 	return courses_list
+
+def to_title(course_name: str, course_id: int):
+	return f'{course_name.upper()} {course_id}'

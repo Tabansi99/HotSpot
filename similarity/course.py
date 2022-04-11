@@ -14,6 +14,9 @@ class Course(object):
 		major, number = title.split(' ')
 		return major, int(number)
 
+	def __repr__(self):
+		return self.title
+
 	def __str__(self):
 		return self.full
 
