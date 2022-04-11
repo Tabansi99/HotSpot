@@ -1,0 +1,7 @@
+fastapi[all]
+firebase-admin
+pandas
+numpy
+scipy
+nltk
+textblob
