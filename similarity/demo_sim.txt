@@ -1,0 +1,140 @@
+Most similar based on Jaccard distance:
+CSCE 110: Programming I                                                CSCE 111: Introduction to Computer Science Con...
+CSCE 111: Introduction to Computer Science Concepts and Programming    CSCE 121: Introduction to Program Design and C...
+CSCE 120: Program Design and Concepts                                  CSCE 111: Introduction to Computer Science Con...
+CSCE 121: Introduction to Program Design and Concepts                  CSCE 111: Introduction to Computer Science Con...
+CSCE 181: Introduction to Computing                                                       CSCE 289: Special Topics in...
+CSCE 201: Fundamentals of Cybersecurity                                          CSCE 465: Computer and Network Security
+CSCE 206: Structured Programming in C                                  CSCE 111: Introduction to Computer Science Con...
+CSCE 221: Data Structures and Algorithms                                           CSCE 120: Program Design and Concepts
+CSCE 222: Discrete Structures for Computing                                             CSCE 442: Scientific Programming
+CSCE 285: Directed Studies                                                                    CSCE 485: Directed Studies
+CSCE 289: Special Topics in...                                                                        CSCE 291: Research
+CSCE 291: Research                                                                        CSCE 289: Special Topics in...
+CSCE 305: Computational Data Science                                                        CSCE 435: Parallel Computing
+CSCE 310: Database Systems                                                    CSCE 350: Computer Architecture and Design
+CSCE 312: Computer Organization                                               CSCE 350: Computer Architecture and Design
+CSCE 313: Introduction to Computer Systems                                         CSCE 464: Wireless and Mobile Systems
+CSCE 314: Programming Languages                                                                CSCE 434: Compiler Design
+CSCE 315: Programming Studio                                               CSCE 331: Foundations of Software Engineering
+CSCE 320: Principles of Data Science                                                          CSCE 421: Machine Learning
+CSCE 331: Foundations of Software Engineering                                               CSCE 315: Programming Studio
+CSCE 350: Computer Architecture and Design                                      CSCE 469: Advanced Computer Architecture
+CSCE 399: High-Impact Experience                                       CSCE 429: Software Development, Globalization ...
+CSCE 402: Law and Policy in Cybersecurity                                                   CSCE 477: Cybersecurity Risk
+CSCE 410: Operating Systems                                                                   CSCE 310: Database Systems
+CSCE 411: Design and Analysis of Algorithms                                         CSCE 436: Computer-Human Interaction
+CSCE 412: Cloud Computing                                                                     CSCE 310: Database Systems
+CSCE 413: Software Security                                                       CSCE 426: Security of Embedded Systems
+CSCE 416: Hardware Design Verification                                                   CSCE 312: Computer Organization
+CSCE 420: Artificial Intelligence                                                CSCE 465: Computer and Network Security
+CSCE 421: Machine Learning                                                          CSCE 320: Principles of Data Science
+CSCE 426: Security of Embedded Systems                                                      CSCE 477: Cybersecurity Risk
+CSCE 429: Software Development, Globalization and Culture Abroad                          CSCE 431: Software Engineering
+CSCE 430: Problem Solving Programming Strategies                             CSCE 452: Robotics and Spatial Intelligence
+CSCE 431: Software Engineering                                                                CSCE 443: Game Development
+CSCE 433: Formal Languages and Automata                                            CSCE 120: Program Design and Concepts
+CSCE 434: Compiler Design                                                                CSCE 314: Programming Languages
+CSCE 435: Parallel Computing                                                        CSCE 305: Computational Data Science
+CSCE 436: Computer-Human Interaction                                         CSCE 411: Design and Analysis of Algorithms
+CSCE 438: Distributed Systems                                                      CSCE 464: Wireless and Mobile Systems
+CSCE 440: Quantum Algorithms                                                        CSCE 320: Principles of Data Science
+CSCE 441: Computer Graphics                                                            CSCE 445: Computers and New Media
+CSCE 442: Scientific Programming                                                       CSCE 420: Artificial Intelligence
+CSCE 443: Game Development                                                                CSCE 431: Software Engineering
+CSCE 444: Structures of Interactive Information                                        CSCE 445: Computers and New Media
+CSCE 445: Computers and New Media                                                            CSCE 441: Computer Graphics
+CSCE 446: Virtual Reality                                                       CSCE 469: Advanced Computer Architecture
+CSCE 447: Data Visualization                                                 CSCE 470: Information Storage and Retrieval
+CSCE 449: Applied Cryptography                                               CSCE 222: Discrete Structures for Computing
+CSCE 451: Software Reverse Engineering                                       CSCE 411: Design and Analysis of Algorithms
+CSCE 452: Robotics and Spatial Intelligence                                         CSCE 320: Principles of Data Science
+CSCE 456: Real-Time Computing                                                            CSCE 312: Computer Organization
+CSCE 461: Embedded Systems for Medical Applications                              CSCE 201: Fundamentals of Cybersecurity
+CSCE 462: Microcomputer Systems                                                            CSCE 456: Real-Time Computing
+CSCE 463: Networks and Distributed Processing                                    CSCE 201: Fundamentals of Cybersecurity
+CSCE 464: Wireless and Mobile Systems                                            CSCE 201: Fundamentals of Cybersecurity
+CSCE 465: Computer and Network Security                                          CSCE 201: Fundamentals of Cybersecurity
+CSCE 469: Advanced Computer Architecture                                      CSCE 350: Computer Architecture and Design
+CSCE 470: Information Storage and Retrieval                                                 CSCE 447: Data Visualization
+CSCE 477: Cybersecurity Risk                                                   CSCE 402: Law and Policy in Cybersecurity
+CSCE 481: Seminar                                                                         CSCE 289: Special Topics in...
+CSCE 482: Senior Capstone Design                                                          CSCE 431: Software Engineering
+CSCE 483: Computer Systems Design                                                       CSCE 482: Senior Capstone Design
+CSCE 485: Directed Studies                                                                    CSCE 285: Directed Studies
+CSCE 489: Special Topics in...                                                            CSCE 289: Special Topics in...
+CSCE 491: Research                                                                        CSCE 289: Special Topics in...
+dtype: object
+
+===============================
+
+Most similar based on Cosine similarity:
+CSCE 110: Programming I                                                CSCE 111: Introduction to Computer Science Con...
+CSCE 111: Introduction to Computer Science Concepts and Programming    CSCE 121: Introduction to Program Design and C...
+CSCE 120: Program Design and Concepts                                  CSCE 111: Introduction to Computer Science Con...
+CSCE 121: Introduction to Program Design and Concepts                  CSCE 111: Introduction to Computer Science Con...
+CSCE 181: Introduction to Computing                                                       CSCE 289: Special Topics in...
+CSCE 201: Fundamentals of Cybersecurity                                          CSCE 465: Computer and Network Security
+CSCE 206: Structured Programming in C                                  CSCE 111: Introduction to Computer Science Con...
+CSCE 221: Data Structures and Algorithms                                                    CSCE 477: Cybersecurity Risk
+CSCE 222: Discrete Structures for Computing                                             CSCE 442: Scientific Programming
+CSCE 285: Directed Studies                                                                    CSCE 485: Directed Studies
+CSCE 289: Special Topics in...                                                                        CSCE 291: Research
+CSCE 291: Research                                                                        CSCE 289: Special Topics in...
+CSCE 305: Computational Data Science                                                        CSCE 435: Parallel Computing
+CSCE 310: Database Systems                                                    CSCE 350: Computer Architecture and Design
+CSCE 312: Computer Organization                                               CSCE 350: Computer Architecture and Design
+CSCE 313: Introduction to Computer Systems                                         CSCE 464: Wireless and Mobile Systems
+CSCE 314: Programming Languages                                                                CSCE 434: Compiler Design
+CSCE 315: Programming Studio                                               CSCE 331: Foundations of Software Engineering
+CSCE 320: Principles of Data Science                                                          CSCE 421: Machine Learning
+CSCE 331: Foundations of Software Engineering                                               CSCE 315: Programming Studio
+CSCE 350: Computer Architecture and Design                                      CSCE 469: Advanced Computer Architecture
+CSCE 399: High-Impact Experience                                                    CSCE 305: Computational Data Science
+CSCE 402: Law and Policy in Cybersecurity                                                   CSCE 477: Cybersecurity Risk
+CSCE 410: Operating Systems                                                                   CSCE 310: Database Systems
+CSCE 411: Design and Analysis of Algorithms                                         CSCE 436: Computer-Human Interaction
+CSCE 412: Cloud Computing                                                                     CSCE 310: Database Systems
+CSCE 413: Software Security                                                       CSCE 426: Security of Embedded Systems
+CSCE 416: Hardware Design Verification                                                   CSCE 312: Computer Organization
+CSCE 420: Artificial Intelligence                                                CSCE 465: Computer and Network Security
+CSCE 421: Machine Learning                                                          CSCE 320: Principles of Data Science
+CSCE 426: Security of Embedded Systems                                                      CSCE 477: Cybersecurity Risk
+CSCE 429: Software Development, Globalization and Culture Abroad                          CSCE 431: Software Engineering
+CSCE 430: Problem Solving Programming Strategies                             CSCE 452: Robotics and Spatial Intelligence
+CSCE 431: Software Engineering                                                                CSCE 443: Game Development
+CSCE 433: Formal Languages and Automata                                            CSCE 120: Program Design and Concepts
+CSCE 434: Compiler Design                                                                CSCE 314: Programming Languages
+CSCE 435: Parallel Computing                                                        CSCE 305: Computational Data Science
+CSCE 436: Computer-Human Interaction                                         CSCE 411: Design and Analysis of Algorithms
+CSCE 438: Distributed Systems                                                      CSCE 464: Wireless and Mobile Systems
+CSCE 440: Quantum Algorithms                                                                 CSCE 413: Software Security
+CSCE 441: Computer Graphics                                                            CSCE 445: Computers and New Media
+CSCE 442: Scientific Programming                                                       CSCE 420: Artificial Intelligence
+CSCE 443: Game Development                                                                CSCE 431: Software Engineering
+CSCE 444: Structures of Interactive Information                                        CSCE 445: Computers and New Media
+CSCE 445: Computers and New Media                                                            CSCE 441: Computer Graphics
+CSCE 446: Virtual Reality                                                       CSCE 469: Advanced Computer Architecture
+CSCE 447: Data Visualization                                                 CSCE 470: Information Storage and Retrieval
+CSCE 449: Applied Cryptography                                               CSCE 222: Discrete Structures for Computing
+CSCE 451: Software Reverse Engineering                                       CSCE 411: Design and Analysis of Algorithms
+CSCE 452: Robotics and Spatial Intelligence                                         CSCE 320: Principles of Data Science
+CSCE 456: Real-Time Computing                                                           CSCE 442: Scientific Programming
+CSCE 461: Embedded Systems for Medical Applications                              CSCE 201: Fundamentals of Cybersecurity
+CSCE 462: Microcomputer Systems                                                            CSCE 456: Real-Time Computing
+CSCE 463: Networks and Distributed Processing                                    CSCE 201: Fundamentals of Cybersecurity
+CSCE 464: Wireless and Mobile Systems                                            CSCE 201: Fundamentals of Cybersecurity
+CSCE 465: Computer and Network Security                                          CSCE 201: Fundamentals of Cybersecurity
+CSCE 469: Advanced Computer Architecture                                      CSCE 350: Computer Architecture and Design
+CSCE 470: Information Storage and Retrieval                                                 CSCE 447: Data Visualization
+CSCE 477: Cybersecurity Risk                                                   CSCE 402: Law and Policy in Cybersecurity
+CSCE 481: Seminar                                                                         CSCE 289: Special Topics in...
+CSCE 482: Senior Capstone Design                                                       CSCE 483: Computer Systems Design
+CSCE 483: Computer Systems Design                                                       CSCE 482: Senior Capstone Design
+CSCE 485: Directed Studies                                                                    CSCE 285: Directed Studies
+CSCE 489: Special Topics in...                                                            CSCE 289: Special Topics in...
+CSCE 491: Research                                                                        CSCE 289: Special Topics in...
+dtype: object
+
+===============================
+
