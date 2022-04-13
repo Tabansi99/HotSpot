@@ -31,7 +31,7 @@ def _augment_corpus(corpus: List[Course], pos: List[Course], neg: List[Course]):
 	return [c for c in corpus if c not in neg] + pos
 
 def _filter_pool(pool: List[Course], pos: List[Course], neg: List[Course]):
-	return [c for c in pool if (c not in pos) and (c not in _neg)]
+	return [c for c in pool if (c not in pos) and (c not in neg)]
 
 def rec_by_name(target_name: str, pos: List[str] = None, neg: List[str] = None):
 	### Search for target course in dataset ###

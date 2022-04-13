@@ -9,6 +9,6 @@ app = FastAPI()
 async def get_recs(course_major: str, course_id: int):
     return {"recs": rec.rec_by_name(format_name(course_major, course_id))}
 
-@app.get("/api/tags")
-async def get_tags():
-    return None
+# @app.get("/api/tags")
+# async def get_tags():
+#     return None
