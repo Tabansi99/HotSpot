@@ -14,6 +14,25 @@ MAX_WORDS = 50
 COURSES = get_courses()
 #################
 
+def _resolve_fb(fb: List[str]):
+	if fb is not None:
+		_fb = []
+		for c in fb:
+			c_lookup = lookup_by_name(c)
+			if c_lookup is None:
+				raise RuntimeWarning(f'Feedback course {c} not found in dataset.')
+			else:
+				_fb.append(c_lookup)
+	else:
+		_fb = None 
+	return _fb
+
+def _augment_corpus(corpus: List[Course], pos: List[Course], neg: List[Course]):
+	return [c for c in corpus if c not in neg] + pos
+
+def _filter_pool(pool: List[Course], pos: List[Course], neg: List[Course]):
+	return [c for c in pool if (c not in pos) and (c not in _neg)]
+
 def rec_by_name(target_name: str, pos: List[str] = None, neg: List[str] = None):
 	### Search for target course in dataset ###
 	target_course = lookup_by_name(target_name)
@@ -21,35 +40,22 @@ def rec_by_name(target_name: str, pos: List[str] = None, neg: List[str] = None):
 		raise RuntimeWarning(f'Target name {target_name} not found in dataset. Returning empty recommendations.')
 		return []
 
-	if pos is not None:
-		_pos = []
-		for c in pos:
-			c_lookup = lookup_by_name(c)
-			if c_lookup is None:
-				raise RuntimeWarning(f'Positive class {c} not found in dataset.')
-			else:
-				_pos.append(c_lookup)
-	else:
-		_pos = None
-
-	if neg is not None:
-		_neg = []
-		for c in neg:
-			c_lookup = lookup_by_name(c)
-			if c_lookup is None:
-				raise RuntimeWarning(f'Negative class {c} not found in dataset.')
-			else:
-				_neg.append(c_lookup)
-	else:
-		_neg = None
+	_pos = _resolve_fb(pos)
+	_neg = _resolve_fb(neg)
 
 	return rec_by_course(target_course, _pos, _neg)
 
-def rec_by_tags(target_tags: List[str]):
+def rec_by_tags(target_tags: List[str], , pos: List[str] = None, neg: List[str] = None):
 	### Clean tags ###
 	_target_tags = [t.lower() for t in target_tags]
 
-	return _rec(COURSES, COURSES, _target_tags)
+	_pos = _resolve_fb(pos)
+	_neg = _resolve_fb(neg)
+
+	corpus = _augment_corpus(COURSES, _pos, _neg)
+	pool = _filter_pool(COURSES, _pos, _neg)
+
+	return _rec(corpus, pool, _target_tags)
 
 def rec_by_course(target_course: Course, pos: List[Course] = None, neg: List[Course] = None):
 	other_courses = [c for c in COURSES if c != target_course]
@@ -57,8 +63,8 @@ def rec_by_course(target_course: Course, pos: List[Course] = None, neg: List[Cou
 	_neg = set() if neg is None else set(neg)
 	_pos = [] if pos is None else pos
 
-	corpus = [c for c in COURSES if c not in _neg] + _pos
-	pool = [c for c in other_courses if (c not in _pos) and (c not in _neg)]
+	corpus = _augment_corpus(COURSES, _pos, _neg)
+	pool = _filter_pool(other_courses, _pos, _neg)
 
 	return _rec(corpus, pool, preprocess_text(target_course.desc))
 
