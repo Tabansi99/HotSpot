@@ -31,7 +31,7 @@ def _augment_corpus(corpus: List[Course], pos: List[Course], neg: List[Course]):
 	return [c for c in corpus if c not in neg] + pos
 
 def _filter_pool(pool: List[Course], pos: List[Course], neg: List[Course]):
-	return [c for c in pool if (c not in pos) and (c not in _neg)]
+	return [c for c in pool if (c not in pos) and (c not in neg)]
 
 def rec_by_name(target_name: str, pos: List[str] = None, neg: List[str] = None):
 	### Search for target course in dataset ###
@@ -45,7 +45,7 @@ def rec_by_name(target_name: str, pos: List[str] = None, neg: List[str] = None):
 
 	return rec_by_course(target_course, _pos, _neg)
 
-def rec_by_tags(target_tags: List[str], , pos: List[str] = None, neg: List[str] = None):
+def rec_by_tags(target_tags: List[str], pos: List[str] = None, neg: List[str] = None):
 	### Clean tags ###
 	_target_tags = [t.lower() for t in target_tags]
 
