@@ -1,55 +1,72 @@
-from course import Course
-from data import get_courses, to_title
+from course import Course, format_name, parse_name
+from data import get_courses, lookup_by_name
 from collections import Counter, defaultdict
-from text_utils import preprocess_text
+from text_utils import preprocess_text, get_word_freqs, get_top_words
 import pandas as pd
 import numpy as np
 from scipy import spatial
+import functools
+import similarity
+from typing import List
 
 ### Constants ###
 MAX_WORDS = 50
+COURSES = get_courses()
 #################
 
-def recommend(course_name: str, course_id: int, n_recs=1):
-	### Get data and create objects ###
-	target_course = to_title(course_name, course_id)
-	course_list = get_courses(course_name)
-	courses = [Course(title, name, hours, desc) for title, name, hours, desc in course_list]
-
-	### Get word frequencies ###
-	freq = defaultdict(int)
-	for c in courses:
-		words = preprocess_text(c.desc)
-		counts = Counter(words)
-		for k in counts.keys():
-			freq[k] += 1
-
-	### Get top MAX_WORDS words ###
-	top_words = [w for w, _ in sorted(freq.items(), key=lambda x: x[1], reverse=True)][:MAX_WORDS]
-	top_set = set(top_words)
-
-	### Map words to unique index for vectors ###
-	w2i = {w:i for i, w in enumerate(top_words)} # word -> index
-
-	### Create empty course matrix ###
-	base_df = pd.DataFrame(
-		np.zeros((len(courses), len(courses))), 
-		columns=[repr(c) for c in courses], 
-		index=[repr(c) for c in courses]
-	)
-
-	### Jaccard similarity ###
-	j_df = base_df.copy(deep=True)
-
-	for c1 in courses:
-		c1_set = set([w for w in preprocess_text(c1.desc) if w in top_set])
-		for c2 in courses:
-			if c1 != c2:
-				c2_set = set([w for w in preprocess_text(c2.desc) if w in top_set])
-
-				j_df[repr(c1)][repr(c2)] = len(c1_set.intersection(c2_set))/len(c1_set.union(c2_set))
-
-	if target_course not in j_df.columns:
+def rec_by_name(target_name: str, pos: List[str] = None, neg: List[str] = None):
+	### Search for target course in dataset ###
+	target_course = lookup_by_name(target_name)
+	if target_course is None:
+		raise RuntimeWarning(f'Target name {target_name} not found in dataset. Returning empty recommendations.')
 		return []
 
-	return j_df[target_course].sort_values(ascending=False).index[:n_recs].to_list()
+	if pos is not None:
+		_pos = []
+		for c in pos:
+			c_lookup = lookup_by_name(c)
+			if c_lookup is None:
+				raise RuntimeWarning(f'Positive class {c} not found in dataset.')
+			else:
+				_pos.append(c_lookup)
+	else:
+		_pos = None
+
+	if neg is not None:
+		_neg = []
+		for c in neg:
+			c_lookup = lookup_by_name(c)
+			if c_lookup is None:
+				raise RuntimeWarning(f'Negative class {c} not found in dataset.')
+			else:
+				_neg.append(c_lookup)
+	else:
+		_neg = None
+
+	return rec_by_course(target_course, _pos, _neg)
+
+def rec_by_tags(target_tags: List[str]):
+	### Clean tags ###
+	_target_tags = [t.lower() for t in target_tags]
+
+	return _rec(COURSES, COURSES, _target_tags)
+
+def rec_by_course(target_course: Course, pos: List[Course] = None, neg: List[Course] = None):
+	other_courses = [c for c in COURSES if c != target_course]
+
+	_neg = set() if neg is None else set(neg)
+	_pos = [] if pos is None else pos
+
+	corpus = [c for c in COURSES if c not in _neg] + _pos
+	pool = [c for c in other_courses if (c not in _pos) and (c not in _neg)]
+
+	return _rec(corpus, pool, preprocess_text(target_course.desc))
+
+def _rec(corpus: List[Course], pool: List[Course], target_items: list):
+	### Get top MAX_WORDS words ###
+	top_set = set(get_top_words([preprocess_text(c.desc) for c in corpus])[:MAX_WORDS])
+	top_words = list(top_set)
+	_target_items = list(filter(lambda x: x in top_set, target_items))
+	### Compute jaccard with rest of courses ###
+	recs = [(repr(c), similarity.jaccard(_target_items, [w for w in preprocess_text(c.desc) if w in top_set])) for c in pool]
+	return [c_str for c_str, _ in sorted(recs, key=lambda x: x[1], reverse=True)]

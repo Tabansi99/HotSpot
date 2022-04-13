@@ -1,7 +1,4 @@
 
-
-def compute_sim(c1, c2):
-	pass
-
-def corpus_matrix(corpus):
-	pass
+def jaccard(listA: list, listB: list):
+	setA, setB = set(listA), set(listB)
+	return len(setA.intersection(setB))/len(setA.union(setB))
