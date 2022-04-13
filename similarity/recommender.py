@@ -45,7 +45,7 @@ def rec_by_name(target_name: str, pos: List[str] = None, neg: List[str] = None):
 
 	return rec_by_course(target_course, _pos, _neg)
 
-def rec_by_tags(target_tags: List[str], , pos: List[str] = None, neg: List[str] = None):
+def rec_by_tags(target_tags: List[str], pos: List[str] = None, neg: List[str] = None):
 	### Clean tags ###
 	_target_tags = [t.lower() for t in target_tags]
 
