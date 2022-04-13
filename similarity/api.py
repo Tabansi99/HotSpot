@@ -7,8 +7,8 @@ app = FastAPI()
 
 @app.get("/api/{course_major}/{course_id}")
 async def get_recs(course_major: str, course_id: int):
-    return {"recs": rec.recommend(format_name(course, course_id), n_recs=4)}
+    return {"recs": rec.rec_by_name(format_name(course_major, course_id))}
 
 @app.get("/api/tags")
 async def get_tags():
-    return 
+    return None
