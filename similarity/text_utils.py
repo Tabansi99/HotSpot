@@ -4,6 +4,8 @@ import re
 from typing import List
 import nltk
 from nltk.stem import WordNetLemmatizer 
+import functools
+from collections import Counter
 
 STOP_WORDS = nltk.corpus.stopwords.words('english')
 LEM = WordNetLemmatizer()
@@ -66,3 +68,11 @@ def filter_ints(tokens: List[str]):
 
 def lemmatize(tokens: List[str]):
 	return [LEM.lemmatize(x) for x in tokens]
+
+def get_top_words(corpus: List[List[str]]):
+	word_freq = get_word_freqs(corpus)
+	return [w for w, _ in sorted(word_freq.items(), key=lambda x: x[1], reverse=True)]
+
+def get_word_freqs(corpus: List[List[str]]):
+	return functools.reduce(lambda d1, d2: d1+d2, [Counter(c) for c in corpus])
+
