@@ -7,7 +7,7 @@ cred = credentials.Certificate("secret.json")
 firebase_admin.initialize_app(cred)
 db = firestore.client()
 
-def get_courses():
+def _pull_courses():
 	# Read data
 	courses_ref = db.collection(u'Courses')
 	docs = courses_ref.stream()
@@ -28,11 +28,14 @@ def get_courses():
 	# [(ID, Name, Credit Hours, Description), ... ]
 	return [Course(name, title, hours, desc) for name, title, hours, desc in course_list]
 
+_courses = _pull_courses()
+_courses_set = set(_courses)
+
 def lookup_by_name(course_name: str):
 	target_course = Course(course_name)
 	if target_course in _courses_set:
 		return _courses[_courses.index(target_course)]
 	return None
 
-_courses = get_courses()
-_courses_set = set(_courses)
+def get_courses():
+	return _courses
