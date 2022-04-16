@@ -1,5 +1,5 @@
 from course import Course, format_name, parse_name
-from data import get_courses, lookup_by_name
+from dataset import get_courses, lookup_by_name
 from collections import Counter, defaultdict
 from text_utils import preprocess_text, get_word_freqs, get_top_words
 import pandas as pd
@@ -8,65 +8,78 @@ from scipy import spatial
 import functools
 import similarity
 from typing import List
+from itertools import chain
 
 ### Constants ###
 MAX_WORDS = 50
 COURSES = get_courses()
 #################
 
-def _resolve_fb(fb: List[str]):
-	if fb is not None:
-		_fb = []
-		for c in fb:
+def _resolve_names(names: List[str]):
+	if names is not None:
+		_names = []
+		for c in names:
 			c_lookup = lookup_by_name(c)
 			if c_lookup is None:
-				raise RuntimeWarning(f'Feedback course {c} not found in dataset.')
+				raise RuntimeWarning(f'Named course {c} not found in dataset.')
 			else:
-				_fb.append(c_lookup)
+				_names.append(c_lookup)
 	else:
-		_fb = None 
-	return _fb
+		_names = None 
+	return _names
 
-def _augment_corpus(corpus: List[Course], pos: List[Course], neg: List[Course]):
-	return [c for c in corpus if c not in neg] + pos
 
-def _filter_pool(pool: List[Course], pos: List[Course], neg: List[Course]):
-	return [c for c in pool if (c not in pos) and (c not in neg)]
+def _augment_targets(targets: List[str], pos: List[Course]):
+	extra_targets = list(set(chain.from_iterable([preprocess_text(c.desc) for c in pos])))
+	return targets + extra_targets 
 
-def rec_by_name(target_name: str, pos: List[str] = None, neg: List[str] = None):
+def _filter_corpus(corpus: List[Course], neg: List[Course]):
+	return [c for c in corpus if c not in neg]
+
+def _filter_pool(pool: List[Course], ignored: List[Course]):
+	return [c for c in pool if (c not in ignored)]
+
+def _filter_pre(recs: List[Course], done: List[Course]):
+	return [c for c in recs if all(p in done for p in c.pre)]
+
+def rec_by_names(target_names: List[str], pos: List[str] = None, neg: List[str] = None, done: List[str] = None):
 	### Search for target course in dataset ###
-	target_course = lookup_by_name(target_name)
-	if target_course is None:
-		raise RuntimeWarning(f'Target name {target_name} not found in dataset. Returning empty recommendations.')
-		return []
+	target_courses = _resolve_names(target_names)
 
-	_pos = _resolve_fb(pos)
-	_neg = _resolve_fb(neg)
+	_pos = _resolve_names(pos)
+	_neg = _resolve_names(neg)
+	_done = _resolve_names(done)
 
-	return rec_by_course(target_course, _pos, _neg)
+	return rec_by_courses(target_courses, _pos, _neg, _done)
 
-def rec_by_tags(target_tags: List[str], pos: List[str] = None, neg: List[str] = None):
+def rec_by_tags(target_tags: List[str], pos: List[str] = None, neg: List[str] = None, done: List[str] = None):
 	### Clean tags ###
 	_target_tags = [t.lower() for t in target_tags]
 
-	_pos = _resolve_fb(pos)
-	_neg = _resolve_fb(neg)
+	_pos = _resolve_names(pos)
+	_neg = _resolve_names(neg)
+	_done = _resolve_names(done)
 
-	corpus = _augment_corpus(COURSES, _pos, _neg)
-	pool = _filter_pool(COURSES, _pos, _neg)
+	_augmented_tags = _augment_targets(_target_tags, _pos)
+	corpus = _filter_corpus(COURSES, _neg)
+	pool = _filter_pool(COURSES, _pos+_neg+_done)
 
-	return _rec(corpus, pool, _target_tags)
+	return _filter_pre(_rec(corpus, pool, _augmented_tags), _done)
 
-def rec_by_course(target_course: Course, pos: List[Course] = None, neg: List[Course] = None):
-	other_courses = [c for c in COURSES if c != target_course]
+def rec_by_courses(target_courses: List[Course], pos: List[Course] = None, neg: List[Course] = None, done: List[Course] = None):
+	other_courses = [c for c in COURSES if c != target_courses]
 
-	_neg = set() if neg is None else set(neg)
+	_neg = [] if neg is None else neg
 	_pos = [] if pos is None else pos
+	_done = [] if done is None else done
 
-	corpus = _augment_corpus(COURSES, _pos, _neg)
-	pool = _filter_pool(other_courses, _pos, _neg)
+	corpus = _filter_corpus(COURSES, _neg)
+	pool = _filter_pool(other_courses, _pos+_neg+_done)
 
-	return _rec(corpus, pool, preprocess_text(target_course.desc))
+	target_items = list(set(chain.from_iterable([preprocess_text(c.desc) for c in target_courses])))
+	augmented_items = _augment_targets(target_items, _pos)
+
+	return _filter_pre(_rec(corpus, pool, augmented_items), _done)
 
 def _rec(corpus: List[Course], pool: List[Course], target_items: list):
 	### Get top MAX_WORDS words ###
@@ -74,5 +87,5 @@ def _rec(corpus: List[Course], pool: List[Course], target_items: list):
 	top_words = list(top_set)
 	_target_items = list(filter(lambda x: x in top_set, target_items))
 	### Compute jaccard with rest of courses ###
-	recs = [(repr(c), similarity.jaccard(_target_items, [w for w in preprocess_text(c.desc) if w in top_set])) for c in pool]
-	return [c_str for c_str, _ in sorted(recs, key=lambda x: x[1], reverse=True)]
+	recs = [(c, similarity.jaccard(_target_items, [w for w in preprocess_text(c.desc) if w in top_set])) for c in pool]
+	return [c for c, _ in sorted(recs, key=lambda x: x[1], reverse=True)]

@@ -1,11 +1,13 @@
+from __future__ import annotations
 
 class Course(object):
-	def __init__(self, name: str, title: str = '', hours: int = 0, desc: str = ''):
+	def __init__(self, name: str, title: str = '', hours: int = 0, desc: str = '', pre: List[Course] = None):
 		self.name = name # CSCE 121
 		self.title = title # Introduction to Programming
 		self.full = f'{self.name}: {self.title}' # CSCE 121: Introduction to Programming
 		self.hours = hours # 3
 		self.desc = desc # This class is the introduction to C programming.
+		self.pre = [] if pre is None else pre
 
 		self.major, self.number = parse_name(name) # ("CSCE", 121)
 		self.rank = int(self.number//100) # 1
@@ -31,3 +33,8 @@ def parse_name(course_name: str):
 	course_major, course_id = course_name.split(' ')
 	return course_major, int(course_id)
 	
+
+class GradedCourse(Course):
+	def __init__(self, name: str, title: str = '', hours: int = 0, desc: str = '', grade: str = ''):
+		super(Course, self).__init__(name, title, hours, desc)
+		self.grade = grade.upper()
