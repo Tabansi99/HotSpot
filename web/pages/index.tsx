@@ -1,10 +1,12 @@
 import { Search2Icon } from '@chakra-ui/icons';
-import { Box, Button, Center, CSSReset, Flex, FormControl, FormLabel, Input, InputGroup, InputLeftAddon, InputLeftElement, Select, Stack, Text } from '@chakra-ui/react';
+import { Box, Button, Center, CSSReset, Flex, FormControl, FormLabel, Input, InputGroup, InputLeftAddon, Select, InputLeftElement, Stack, Text } from '@chakra-ui/react';
 import { MdUploadFile } from "react-icons/md";
 import React, { useState } from 'react';
 import Layout from '../components/Layout'
+import ReactSelect, { components } from "react-select";
 import FormData from 'form-data';
 import { sampleCourses } from '../utils/courses';
+import { CreatableSelect } from 'chakra-react-select';
 
 const IndexPage = () => {
   return (
@@ -27,36 +29,37 @@ const ClassForm = () => {
   const [fileName, setFileName] = useState('No file chosen');
   const [course, setCourse] = useState('');
   const [major, setMajor] = useState('');
-  //const formData = new FormData();
+  const formData = new FormData();
 
   function validateForm(event: React.SyntheticEvent) {
     sampleCourses.push(course);
     
-    //formData.append('file', selectedFile);
+    formData.append('file', selectedFile);
 
-    fetch(
-      '/api/recommendation',
-      {
-        method: 'POST',
-        body: JSON.stringify({
-          course: course,
-          major: major
-        }),
-        redirect: "follow"
-      }
-    )
-      .then((res) => res.json())
-      .then((res) => {
-        console.log('Success: ', res)
-      })
-      .catch((err) => {
-        console.log('Error: ', err);
-      })
+    // fetch(
+    //   '/api/test',
+    //   {
+    //     method: 'POST',
+    //     body: formData,
+    //     // body: JSON.stringify({
+    //     //   course: course,
+    //     //   major: major
+    //     // }),
+    //     redirect: "follow"
+    //   }
+    // )
+    //   .then((res) => res.json())
+    //   .then((res) => {
+    //     console.log('Success: ', res)
+    //   })
+    //   .catch((err) => {
+    //     console.log('Error: ', err);
+    //   })
   }
 
   return (
-    <Box>
-      <form onSubmit={validateForm}>
+    <Box width={400}>
+      <form action='api/courses' onSubmit={validateForm} method='post'>
         <Stack>
           <FormControl id="major">
             <FormLabel>What's your major?</FormLabel>
@@ -106,7 +109,7 @@ const ClassForm = () => {
                 focusBorderColor="#660000"
                 _placeholder={{color: '#A17C73'}}
                 borderColor={'black'}
-                name='class'
+                name='course'
                 type="text"
                 color={"#660000"}
                 variant='flushed'
@@ -118,31 +121,79 @@ const ClassForm = () => {
               />
             </InputGroup>
           </FormControl>
-          <FormControl borderRadius={0} id="transcript">
-            <FormLabel> Upload unofficial transcript </FormLabel>
-            <FormLabel>
-              <Text display={'-webkit-inline-flex'} >
-                <MdUploadFile size={40} />
-                <p>&emsp;</p>
-                <Center>
-                  {fileName}
-                </Center>
-              </Text>
-            </FormLabel>
-            <Input 
-              name='transcript'
-              display={'none'}
-              type="file"
-              variant='unstyled'
-              p={2}
-              onChange={
-                (event) => {
-                  const name = event.target.value;
-                  setFileName(name.split(/(\\|\/)/g).pop());
-                  setSelectedFile(event.target.files[0]);
+          <FormControl id="tags">
+            <FormLabel>Areas of interest?</FormLabel>
+            <CreatableSelect
+              focusBorderColor='#660000'
+              tagVariant='solid'
+              colorScheme='gray'
+              isMulti
+              name='tags'
+              options={[
+                {
+                  label: "Web Development",
+                  value: "Web Development",
+                  colorScheme: "red"
+                },
+                {
+                  label: "Artificial Intelligence",
+                  value: "Artificial Intelligence",
+                  colorScheme: "green"
+                },
+                {
+                  label: "Database",
+                  value: "Database",
+                  colorScheme: "blue"
+                },
+                {
+                  label: "User Interface",
+                  value: "User Interface",
+                  colorScheme: 'gray'
+                },
+                {
+                  label: "Recommender Sytems",
+                  value: "Recommender Sytems",
+                  colorScheme: "pink"
+                },
+                {
+                  label: "Machine Learning",
+                  value: "Machine Learning",
+                  colorScheme: "orange"
+                },
+                {
+                  label: "Software Development",
+                  value: "Software Development",
+                  colorScheme: "yellow"
+                },
+                {
+                  label: "Systems",
+                  value: "Systems",
+                  colorScheme: "teal"
+                },
+                {
+                  label: "Distributed Sytems",
+                  value: "Distributed Sytems",
+                  colorScheme: "cyan"
+                },
+                {
+                  label: "Financial Systems",
+                  value: "Financial Systems",
+                  colorScheme: "purple"
                 }
-              }
-              required
+              ]} 
+            />
+          </FormControl>
+          <FormControl borderRadius={0} id="transcript">
+            <FormLabel> For better recommendations please list some course you've previously taken e.g. CSCE 121 </FormLabel>
+            <CreatableSelect
+              focusBorderColor='#660000'
+              tagVariant='solid'
+              colorScheme='gray'
+              isMulti
+              onBlur={(event) => {
+                console.log(event.target);
+              }}
+              name='prevClasses'
             />
           </FormControl>
           <Stack spacing={10}>

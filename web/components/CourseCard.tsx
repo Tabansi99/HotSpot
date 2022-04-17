@@ -40,6 +40,7 @@ export const CourseCard = ({
   credit
 }: Course) => {
   const [isClicked, setIsClicked] = useState(false);
+  var available = true;
 
   const more = sections.slice(1);
 
@@ -47,6 +48,14 @@ export const CourseCard = ({
     const total = dist.A + dist.B + dist.C + dist.D + dist.F + dist.Q;
 
     return (grade/total) * 100;
+  }
+
+  for (let i = 0; i < sections.length; ++i) {
+    const temp = sections.at(i);
+
+    if ((temp.capacity - temp.actual) <= 0) {
+      available = false;
+    } 
   }
 
   return (
@@ -115,27 +124,52 @@ export const CourseCard = ({
 
         { sections.length > 0 ?
           <Box pt={2} textAlign={'center'}>
-            <Link
-              target="_blank"
-              style={{ textDecoration: 'none' }}
-            >
-              <Button
-                type="submit"
-                bg={'#660000'}
-                color={'white'}
-                _hover={{
-                  bg: 'red.600',
-                }}
-                mt={4}
-                width="72"
-                p={5}
-                borderColor={'black'}
-                borderWidth='thick'
-                borderRadius={15}
+            { available ? 
+              <Link
+                target="_blank"
+                style={{ textDecoration: 'none' }}
+                href='https://compassxe-ssb.tamu.edu/StudentRegistrationSsb/ssb/registration'
               >
-                Notify Me
-              </Button>
-            </Link>
+                <Button
+                  type="submit"
+                  bg={'#660000'}
+                  color={'white'}
+                  _hover={{
+                    bg: 'red.600',
+                  }}
+                  mt={4}
+                  width="72"
+                  p={5}
+                  borderColor={'black'}
+                  borderWidth='thick'
+                  borderRadius={15}
+                >
+                  Register
+                </Button>
+              </Link>
+              :
+              <Link
+                target="_blank"
+                style={{ textDecoration: 'none' }}
+              >
+                <Button
+                  type="submit"
+                  bg={'#660000'}
+                  color={'white'}
+                  _hover={{
+                    bg: 'red.600',
+                  }}
+                  mt={4}
+                  width="72"
+                  p={5}
+                  borderColor={'black'}
+                  borderWidth='thick'
+                  borderRadius={15}
+                >
+                  Notify Me
+                </Button>
+              </Link>
+            }
           </Box> :
           <Box pt={2} textAlign={'center'}>
             <Link

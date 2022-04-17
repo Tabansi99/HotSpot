@@ -17,7 +17,7 @@ const IndexPage = () => {
 
   useEffect(() => {
     const fetchStuff = async () => {
-      await fetch('/api/course/')
+      await fetch('/api/courses/')
         .then((res) => {
           if (res.ok) {
             return res.json();
@@ -39,7 +39,7 @@ const IndexPage = () => {
 
   useEffect(() => {
     const fetchStuff = async () => {
-      await fetch('/api/recommendation/')
+      await fetch('/api/recommendations/')
         .then((res) => {
           if (res.ok) {
             return res.json();
@@ -141,7 +141,7 @@ const IndexPage = () => {
     }
   }
 
-  console.log(recCards.length);
+  //console.log(recCards.length);
 
   function getRecs(test: string) {
     console.log(test);

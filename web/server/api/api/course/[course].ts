@@ -1,10 +1,9 @@
-import { collection, doc, getDocs } from 'firebase/firestore';
+import { collection, getDocs } from 'firebase/firestore';
 import { NextApiRequest, NextApiResponse } from 'next';
-import { db } from '../../../firebase/clientApp';
+import { db } from '../../../../firebase/clientApp';
 
-console.log('Entered');
-
-const handler = async (_req: NextApiRequest , res: NextApiResponse) => {
+const handler = async (req: NextApiRequest , res: NextApiResponse) => {
+  const { course } = req.query;
   const courseDB = collection(db, 'Courses');
   const coursesSnapShot = await getDocs(courseDB);
   const courseMap = new Map<any, any>();
@@ -41,9 +40,18 @@ const handler = async (_req: NextApiRequest , res: NextApiResponse) => {
     });
   });
 
-  const course = Object.fromEntries(courseMap);
+  const courses = Object.fromEntries(courseMap);
+  const response = courses[String(course)];
 
-  res.send(course);
+  if (response) {
+    res.send(response);
+  }
+  else {
+    res.send({
+      exists: false,
+    });
+  }
+  
 }
 
 export default handler;
