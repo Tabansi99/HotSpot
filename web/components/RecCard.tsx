@@ -1,5 +1,5 @@
 import { CheckCircleIcon, CheckIcon } from '@chakra-ui/icons';
-import { Box, Button, Icon, Link, Text } from '@chakra-ui/react';
+import { Box, Button, Checkbox, Icon, Link, Text } from '@chakra-ui/react';
 import { useState } from 'react';
 import { ProgressBar } from 'react-bootstrap'
 import { RiCloseCircleFill } from "react-icons/ri";
@@ -47,14 +47,20 @@ export const RecommendationCard = ({
   //const [isClicked, setIsClicked] = useState(false);
 
   const more = sections.slice(1);
-  // console.log(course);
-  // console.log(sections.length);
-  // console.log('----------------------------------------------');
+  var available = true;
 
   function gradePercent(grade: number, dist: Professor) {
     const total = dist.A + dist.B + dist.C + dist.D + dist.F + dist.Q;
 
     return (grade/total) * 100;
+  }
+
+  for (let i = 0; i < sections.length; ++i) {
+    const temp = sections.at(i);
+
+    if ((temp.capacity - temp.actual) <= 0) {
+      available = false;
+    } 
   }
 
   return (
@@ -122,13 +128,42 @@ export const RecommendationCard = ({
         </Text>
 
         <Text fontWeight="bold">
+          <Text color={"#660000"} as="b" display="inline-block"> Have you previously taken this course? </Text> &ensp;
+          <Checkbox colorScheme={'red'} size='lg' outline='bold'/>
+        </Text>
+
+        <Text fontWeight="bold">
           <Text color={"#660000"} as="b" display="inline-block"> Is this recommendation helpful? </Text> &ensp;
           <Link borderRadius='100'><CheckCircleIcon boxSize={'8'} onClick={() => {feedback('positive')}}/></Link> &ensp;
           <Link borderRadius='100'><Icon as={RiCloseCircleFill} boxSize={'10'} onClick={() => {feedback('negative')}}/></Link>
         </Text>
       </Box>
       { sections.length > 0 ?
-          <Box p={4} pt={0} textAlign={'center'}>
+        <Box p={4} textAlign={'center'}>
+          { available ? 
+            <Link
+              target="_blank"
+              style={{ textDecoration: 'none' }}
+              href='https://compassxe-ssb.tamu.edu/StudentRegistrationSsb/ssb/registration'
+            >
+              <Button
+                type="submit"
+                bg={'#660000'}
+                color={'white'}
+                _hover={{
+                  bg: 'red.600',
+                }}
+                mt={4}
+                width="72"
+                p={5}
+                borderColor={'black'}
+                borderWidth='thick'
+                borderRadius={15}
+              >
+                Register
+              </Button>
+            </Link>
+            :
             <Link
               target="_blank"
               style={{ textDecoration: 'none' }}
@@ -150,32 +185,33 @@ export const RecommendationCard = ({
                 Notify Me
               </Button>
             </Link>
-          </Box> :
-          <Box p={4} pt={0} textAlign={'center'}>
-            <Link
-              target="_blank"
-              style={{ textDecoration: 'none' }}
+          }
+        </Box> :
+        <Box p={4} textAlign={'center'}>
+          <Link
+            target="_blank"
+            style={{ textDecoration: 'none' }}
+          >
+            <Button
+              type="submit"
+              bg={'#660000'}
+              color={'white'}
+              _hover={{
+                bg: '#660000',
+              }}
+              disabled
+              mt={4}
+              width="72"
+              p={5}
+              borderColor={'black'}
+              borderWidth='thick'
+              borderRadius={15}
             >
-              <Button
-                type="submit"
-                bg={'#660000'}
-                color={'white'}
-                _hover={{
-                  bg: '#660000',
-                }}
-                disabled
-                mt={4}
-                width="72"
-                p={5}
-                borderColor={'black'}
-                borderWidth='thick'
-                borderRadius={15}
-              >
-                Notify Me
-              </Button>
-            </Link>
-          </Box>
-        }
+              Notify Me
+            </Button>
+          </Link>
+        </Box>
+      }
     </Box>
   );
 };
