@@ -16,12 +16,17 @@ MAX_WORDS = 50
 COURSES = get_courses()
 WV = gensim.downloader.load('glove-wiki-gigaword-50') 
 
-TAG_JAC_WEIGHT = 0.5
-TAG_TITLE_WEIGHT = 0.5
+# Sum to 1
+TAG_JAC_WEIGHT = 0.3
+TAG_TITLE_WEIGHT = 0.7
+
+# Sum to 1
 TARGET_JAC_WEIGHT = 0.2
-TARGET_TITLE_WEIGHT = 0.5
-TARGET_WEIGHT = 0.5
-TAG_WEIGHT = 0.5
+TARGET_TITLE_WEIGHT = 0.8
+
+# Sum to 1
+TARGET_WEIGHT = 0.7
+TAG_WEIGHT = 0.3
 #################
 
 def _resolve_names(names: List[str]):
@@ -37,95 +42,125 @@ def _resolve_names(names: List[str]):
 		_names = None 
 	return _names
 
-def _augment_targets(targets: List[str], pos: List[Course]):
+def _add_desc_targets(targets: List[str], pos: List[Course]):
 	extra_targets = list(set(chain.from_iterable([preprocess_text(c.desc) for c in pos])))
 	return targets + extra_targets 
 
-def _filter_corpus(corpus: List[Course], neg: List[Course]):
-	return [c for c in corpus if c not in neg]
+def _add_title_targets(targets: List[str], pos: List[Course]):
+	extra_targets = list(set(chain.from_iterable([preprocess_text(c.title) for c in pos])))
+	return targets + extra_targets 
 
-def _filter_pool(pool: List[Course], ignored: List[Course]):
-	return [c for c in pool if (c not in ignored)]
+def _filter_corpus(corpus: List[Course], neg: List[Course]):
+	return [c for c in corpus if (c not in neg)]
+
+def _filter_pool(pool: List[Course], ignored: List[Course], done: List[Course]):
+	return [c for c in pool if ((c not in ignored) and all(p in done for p in c.pre))]
 
 def rec_by_names(target_names: List[str], pos: List[str] = None, neg: List[str] = None, done: List[str] = None):
-	### Search for target course in dataset ###
+	# Lookup everything by name, then pass to rec_by_courses
 	target_courses = _resolve_names(target_names)
 
-	_pos = _resolve_names(pos)
-	_neg = _resolve_names(neg)
-	_done = _resolve_names(done)
+	pos_res = _resolve_names(pos)
+	neg_res = _resolve_names(neg)
+	done_res = _resolve_names(done)
 
-	return rec_by_courses(target_courses, _pos, _neg, _done)
+	return rec_by_courses(target_courses, pos_res, neg_res, done_res)
 
 def rec_by_tags(target_tags: List[str], pos: List[str] = None, neg: List[str] = None, done: List[str] = None):
-	### Clean tags ###
-	_target_tags = [t.lower() for t in target_tags]
+	# Clean tags
+	clean_target_tags = [t.lower() for t in target_tags]
 
-	_pos = _resolve_names(pos)
-	_neg = _resolve_names(neg)
-	_done = _resolve_names(done)
+	# Lookup courses by name
+	pos_res = _resolve_names(pos)
+	neg_res = _resolve_names(neg)
+	done_res = _resolve_names(done)
 
-	_augmented_tags = _augment_targets(_target_tags, _pos)
-	corpus = _filter_corpus(COURSES, _neg)
-	pool = _filter_pool(COURSES, _pos+_neg+_done)
+	# Add pos desc to tags
+	tags_with_desc = _add_desc_targets(clean_target_tags, pos_res)
 
-	jac_scores = _get_jaccard_scores(corpus, pool, _augmented_tags)
+	# Add pos title to tags
+	tags_with_title = _add_title_targets(clean_target_tags, pos_res)
+
+	# Remove negative courses from corpus
+	corpus = _filter_corpus(COURSES, neg_res)
+
+	# Remove positive courses, negative courses, and completed courses from result pool
+	# Also removes prerequisites
+	pool = _filter_pool(COURSES, pos_res+neg_res+done_res, done_res)
+
+	# Get description scores
+	jac_scores = _get_jaccard_scores(corpus, pool, tags_with_desc)
 	jac_min, jac_max = min(jac_scores, key=lambda x: x[1])[1], max(jac_scores, key=lambda x: x[1])[1]
 
-	title_scores = _get_title_scores(pool, _augmented_tags)
+	# Get title scores
+	title_scores = _get_title_scores(pool, tags_with_title)
 	title_min, title_max = min(title_scores, key=lambda x: x[1])[1], max(title_scores, key=lambda x: x[1])[1]
 
+	# Combine scores
 	combined_scores = defaultdict(float)
 	for c, score in jac_scores:
 		combined_scores[c] += TAG_JAC_WEIGHT*(score - jac_min)/(jac_max - jac_min)
 	for c, score in title_scores:
 		combined_scores[c] += TAG_TITLE_WEIGHT*(score - title_min)/(title_max - title_min)
 
+	# Sort final score dictionary
 	recs = sorted(combined_scores.items(), key=lambda x: x[1], reverse=True)
-	return [(c, score) for c, score in recs if all(p in _done for p in c.pre)]
+
+	return recs
 
 def rec_by_courses(target_courses: List[Course], pos: List[Course] = None, neg: List[Course] = None, done: List[Course] = None):
-	other_courses = [c for c in COURSES if c != target_courses]
+	# Cleanup inputs
+	neg_res = [] if neg is None else neg
+	pos_res = [] if pos is None else pos
+	done_res = [] if done is None else done
 
-	_neg = [] if neg is None else neg
-	_pos = [] if pos is None else pos
-	_done = [] if done is None else done
+	# Remove negative courses from corpus
+	corpus = _filter_corpus(COURSES, neg_res)
 
-	corpus = _filter_corpus(COURSES, _neg)
-	pool = _filter_pool(other_courses, _pos+_neg+_done)
+	# Combine pos and target_courses
+	combined_courses = list(set(target_courses+pos_res))
 
-	target_items = list(set(chain.from_iterable([preprocess_text(c.desc) for c in target_courses])))
-	augmented_items = _augment_targets(target_items, _pos)
+	# Remove pos, neg, and done courses from selection pool
+	# and filter prereqs
+	pool = _filter_pool(COURSES, pos_res+neg_res+done_res, done_res)
 
-	titles = [c.title for c in pos+target_courses] 
+	# Add pos desc to target desc
+	target_items = list(set(chain.from_iterable([preprocess_text(c.desc) for c in combined_courses])))
 
-	jac_scores = _get_jaccard_scores(corpus, pool, augmented_items)
+	# Add pos title to target titles
+	target_titles = [c.title for c in combined_courses] 
+
+	# Get desc scores
+	jac_scores = _get_jaccard_scores(corpus, pool, target_items)
 	jac_min, jac_max = min(jac_scores, key=lambda x: x[1])[1], max(jac_scores, key=lambda x: x[1])[1]
-	title_scores = _get_title_scores(pool, titles)
+	
+	# Get title scores
+	title_scores = _get_title_scores(pool, target_titles)
 	title_min, title_max = min(title_scores, key=lambda x: x[1])[1], max(title_scores, key=lambda x: x[1])[1]
 
+	# Combine scores
 	combined_scores = defaultdict(float)
 	for c, score in jac_scores:
 		combined_scores[c] += TARGET_JAC_WEIGHT*(score - jac_min)/(jac_max - jac_min)
 	for c, score in title_scores:
 		combined_scores[c] += TARGET_TITLE_WEIGHT*(score - title_min)/(title_max - title_min)
 
+	# Sort final score dictionary
 	recs = sorted(combined_scores.items(), key=lambda x: x[1], reverse=True)
-	return [(c, score) for c, score in recs if all(p in _done for p in c.pre)]
+	
+	return recs
 
 def rec_by_names_and_tags(target_names: List[str], target_tags: List[str], pos: List[str] = None, neg: List[str] = None, done: List[str] = None):
-	target_courses = _resolve_names(target_names)
 
-	_pos = _resolve_names(pos)
-	_neg = _resolve_names(neg)
-	_done = _resolve_names(done)
-
+	# Get tag scores 
 	tag_recs = rec_by_tags(target_tags, pos, neg, done)
 	tag_min, tag_max = min(tag_recs, key=lambda x:x[1])[1], max(tag_recs, key=lambda x:x[1])[1]
 
-	target_recs = rec_by_courses(target_courses, _pos, _neg, _done)
+	# Get target scores
+	target_recs = rec_by_names(target_names, pos, neg, done)
 	target_min, target_max = min(target_recs, key=lambda x:x[1])[1], max(target_recs, key=lambda x:x[1])[1]
 
+	# Combine tag and target scores
 	combined_scores = defaultdict(float)
 	for c, score in tag_recs:
 		combined_scores[c] += TAG_WEIGHT*(score - tag_min)/(tag_max - tag_min)
@@ -133,14 +168,8 @@ def rec_by_names_and_tags(target_names: List[str], target_tags: List[str], pos: 
 		combined_scores[c] += TARGET_WEIGHT*(score - target_min)/(target_max - target_min)
 
 	recs = sorted(combined_scores.items(), key=lambda x: x[1], reverse=True)
-	print('===========================')
-	for c, score in recs:
-
-		print(c)
-		print(c.desc)
-		print(score)
-		print('')
-	return [(c, score) for c, score in recs if all(p in _done for p in c.pre)]
+	
+	return recs
 
 
 def _get_jaccard_scores(corpus: List[Course], pool: List[Course], target_items: list):
