@@ -15,7 +15,7 @@ def test_recommendations():
             'done': ['CSCE 121', 'CSCE 222', 'CSCE 313']
         }
     )
-    print(response.json()['combined_targets'])
+    print(response.json()['all'])
     assert(False)
 
 
