@@ -8,10 +8,14 @@ def test_recommendations():
     response = client.put(
         '/api/recs/',
         json={
-            'pos': ['CSCE 121']
+            'targets': ['CSCE 431'],
+            'tags': ['Artificial Intelligence'],
+            'pos': ['CSCE 445'],
+            'neg': ['CSCE 443'],
+            'done': ['CSCE 121', 'CSCE 222', 'CSCE 313']
         }
     )
-    print(response.json())
+    print(response.json()['combined_targets'])
     assert(False)
 
 
