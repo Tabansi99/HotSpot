@@ -30,8 +30,6 @@ NOISE_WORDS = set([
 	'student',
 	'ecen',
 	'vist',
-	'special',
-	'topic',
 ])
 
 def get_ngrams(text: str, n: int = 1):
@@ -45,11 +43,15 @@ def preprocess_text(text: str):
 						filter_ints(
 							tokenize(
 								strip_punc(
-									lowercase(text)
-			))))))
+									replace_special(
+										lowercase(text)
+			)))))))
 
 def lowercase(text: str):
 	return text.lower()
+
+def replace_special(text: str):
+	return text.replace('-', ' ')
 
 def strip_punc(text: str):
     return ''.join([c for c in text if c not in string.punctuation])

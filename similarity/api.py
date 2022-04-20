@@ -35,13 +35,14 @@ async def get_recommendations(fb: Feedback):
 
     return {
         "targets": {
-            t: [repr(c) for c in rec.rec_by_names([t], _pos, _neg, _done)] for t in _targets
+            t: [repr(c) for c, _ in rec.rec_by_names([t], _pos, _neg, _done)] for t in _targets
         },
         "tags": {
-            t: [repr(c) for c in rec.rec_by_tags([t], _pos, _neg, _done)] for t in _tags
+            t: [repr(c) for c, _ in rec.rec_by_tags([t], _pos, _neg, _done)] for t in _tags
         },
-        "combined_tags": [repr(c) for c in rec.rec_by_tags(_tags, _pos, _neg, _done)],
-        "combined_targets": [repr(c) for c in rec.rec_by_names(_targets, _pos, _neg, _done)]
+        "combined_tags": [repr(c) for c, _ in rec.rec_by_tags(_tags, _pos, _neg, _done)],
+        "combined_targets": [repr(c) for c, _ in rec.rec_by_names(_targets, _pos, _neg, _done)],
+        "all": [repr(c) for c, _ in rec.rec_by_names_and_tags(_targets, _tags, _pos, _neg, _done)]
     } 
 
 
