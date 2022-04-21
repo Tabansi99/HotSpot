@@ -122,7 +122,7 @@ def rec_by_courses(target_courses: List[Course], pos: List[Course] = None, neg: 
 
 	# Remove pos, neg, and done courses from selection pool
 	# and filter prereqs
-	pool = _filter_pool(COURSES, pos_res+neg_res+done_res, done_res)
+	pool = _filter_pool(COURSES, pos_res+neg_res+done_res+target_courses, done_res)
 
 	# Add pos desc to target desc
 	target_items = list(set(chain.from_iterable([preprocess_text(c.desc) for c in combined_courses])))
