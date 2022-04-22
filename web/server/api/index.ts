@@ -12,6 +12,8 @@ declare module 'express-session' {
     major: string;
     tags: String[];
     prevClasses: String[];
+    pos: String[];
+    neg: String[];
   }
 }
 
