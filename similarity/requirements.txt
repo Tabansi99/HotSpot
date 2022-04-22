@@ -6,3 +6,4 @@ scipy
 nltk
 textblob
 gensim
+yagmail (for sending emails)
