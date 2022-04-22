@@ -9,7 +9,7 @@ const urlencodedParser = bodyParser.urlencoded({ extended: false });
 // console.log('Entered');
 courses.post('/', urlencodedParser, async (req, res) => {
   const { major, course, tags, prevClasses } = req.body;
-
+  console.log(req.body);
   // console.log(major);
   // console.log(course);
   // console.log(tags);
@@ -17,8 +17,29 @@ courses.post('/', urlencodedParser, async (req, res) => {
 
   req.session.class = course;
   req.session.major = major;
-  req.session.tags = tags;
-  req.session.prevClasses = prevClasses;
+  
+  if (tags == '') {
+    req.session.tags = [];
+  }
+  else if (!Array.isArray(tags)) {
+    req.session.tags = [ tags ];
+  }
+  else {
+    req.session.tags = tags;
+  }
+
+  if (prevClasses == '') {
+    req.session.prevClasses = [];
+  }
+  else if (!Array.isArray(prevClasses)) {
+    req.session.prevClasses = [ prevClasses ];
+  }
+  else {
+    req.session.prevClasses = prevClasses;
+  }
+
+  req.session.neg = [];
+  req.session.pos = [];
 
   res.redirect(`/${course}`)
 });

@@ -28,10 +28,8 @@ test.get('/', urlencodedParser, async (req, res) => {
   )
     .then((res) => res.json())
     .then((resp) => {
-      console.log(resp);
-      res.send({
-        resp
-      });
+      //console.log(resp);
+      res.send(resp.all);
     })
     .catch((err) => {
       console.log('Error: ', err);

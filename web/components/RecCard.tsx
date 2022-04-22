@@ -129,13 +129,13 @@ export const RecommendationCard = ({
 
         <Text fontWeight="bold">
           <Text color={"#660000"} as="b" display="inline-block"> Have you previously taken this course? </Text> &ensp;
-          <Checkbox colorScheme={'red'} size='lg' outline='bold'/>
+          <Checkbox colorScheme={'red'} onChange={() => {feedback(`done/${course}`)}} size='lg' outline='bold'/>
         </Text>
 
         <Text fontWeight="bold">
           <Text color={"#660000"} as="b" display="inline-block"> Is this recommendation helpful? </Text> &ensp;
-          <Link borderRadius='100'><CheckCircleIcon boxSize={'8'} onClick={() => {feedback('positive')}}/></Link> &ensp;
-          <Link borderRadius='100'><Icon as={RiCloseCircleFill} boxSize={'10'} onClick={() => {feedback('negative')}}/></Link>
+          <Link borderRadius='100'><CheckCircleIcon boxSize={'8'} onClick={() => {feedback(`pos/${course}`)}}/></Link> &ensp;
+          <Link borderRadius='100'><Icon as={RiCloseCircleFill} boxSize={'10'} onClick={() => {feedback(`neg/${course}`)}}/></Link>
         </Text>
       </Box>
       { sections.length > 0 ?
