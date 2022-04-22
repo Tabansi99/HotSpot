@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 class Course(object):
-	def __init__(self, name: str, title: str = '', hours: int = 0, desc: str = '', pre: List[Course] = None):
+	def __init__(self, name: str, title: str = '', hours: int = 0, desc: str = '', pre: List[str] = None):
 		self.name = name # CSCE 121
 		self.title = title # Introduction to Programming
 		self.full = f'{self.name}: {self.title}' # CSCE 121: Introduction to Programming
