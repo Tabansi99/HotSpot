@@ -99,9 +99,11 @@ def rec_by_tags(target_tags: List[str], pos: List[str] = None, neg: List[str] = 
 	# Combine scores
 	combined_scores = defaultdict(float)
 	for c, score in jac_scores:
-		combined_scores[c] += TAG_JAC_WEIGHT*(score - jac_min)/(jac_max - jac_min)
+		if jac_max - jac_min > 0:
+			combined_scores[c] += TAG_JAC_WEIGHT*(score - jac_min)/(jac_max - jac_min)
 	for c, score in title_scores:
-		combined_scores[c] += TAG_TITLE_WEIGHT*(score - title_min)/(title_max - title_min)
+		if title_max - title_min > 0:
+			combined_scores[c] += TAG_TITLE_WEIGHT*(score - title_min)/(title_max - title_min)
 
 	# Sort final score dictionary
 	recs = sorted(combined_scores.items(), key=lambda x: x[1], reverse=True)
@@ -141,9 +143,11 @@ def rec_by_courses(target_courses: List[Course], pos: List[Course] = None, neg: 
 	# Combine scores
 	combined_scores = defaultdict(float)
 	for c, score in jac_scores:
-		combined_scores[c] += TARGET_JAC_WEIGHT*(score - jac_min)/(jac_max - jac_min)
+		if jac_max - jac_min > 0:
+			combined_scores[c] += TARGET_JAC_WEIGHT*(score - jac_min)/(jac_max - jac_min)
 	for c, score in title_scores:
-		combined_scores[c] += TARGET_TITLE_WEIGHT*(score - title_min)/(title_max - title_min)
+		if title_max - title_min:
+			combined_scores[c] += TARGET_TITLE_WEIGHT*(score - title_min)/(title_max - title_min)
 
 	# Sort final score dictionary
 	recs = sorted(combined_scores.items(), key=lambda x: x[1], reverse=True)
@@ -163,9 +167,11 @@ def rec_by_names_and_tags(target_names: List[str], target_tags: List[str], pos: 
 	# Combine tag and target scores
 	combined_scores = defaultdict(float)
 	for c, score in tag_recs:
-		combined_scores[c] += TAG_WEIGHT*(score - tag_min)/(tag_max - tag_min)
+		if tag_max - tag_min > 0:
+			combined_scores[c] += TAG_WEIGHT*(score - tag_min)/(tag_max - tag_min)
 	for c, score in target_recs:
-		combined_scores[c] += TARGET_WEIGHT*(score - target_min)/(target_max - target_min)
+		if target_max - target_min > 0:
+			combined_scores[c] += TARGET_WEIGHT*(score - target_min)/(target_max - target_min)
 
 	recs = sorted(combined_scores.items(), key=lambda x: x[1], reverse=True)
 	
