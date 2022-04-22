@@ -199,8 +199,8 @@ def _get_title_scores(pool: List[Course], target_items: list):
 				score = sum(WV.similarity(w1, w2) for w2 in w2_words)
 				inner_scores.append(score)
 
-
-			outer_scores.append(sum(inner_scores)/len(inner_scores))
+			if len(inner_scores) > 0:
+				outer_scores.append(sum(inner_scores)/len(inner_scores))
 
 		if len(outer_scores) > 0:
 			class_scores.append((c, (sum(outer_scores)/len(outer_scores))))
