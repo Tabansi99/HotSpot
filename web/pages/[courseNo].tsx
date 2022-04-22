@@ -1,5 +1,4 @@
-import { Search2Icon } from '@chakra-ui/icons';
-import { Box, Button, Center, CircularProgress, CSSReset, Flex, FormControl, FormLabel, Grid, HStack, Input, InputGroup, InputLeftAddon, InputLeftElement, Select, Stack, Text } from '@chakra-ui/react';
+import { Box, CircularProgress, CSSReset, Grid, Text } from '@chakra-ui/react';
 import React, { useEffect, useState } from 'react';
 import Layout from '../components/Layout'
 import { Course, CourseCard, Professor, Sections } from '../components/CourseCard';
@@ -13,7 +12,7 @@ const IndexPage = () => {
   const course = String(courseNo);
   const [data, setData] = useState<any>();
   const [recs, setRecs] = useState<any>();
-  const [recommendations, setRecommendations] = useState(true);
+  const [recfeedbackURL, setRecFeedbackURL] = useState('');
 
   useEffect(() => {
     const fetchStuff = async () => {
@@ -27,7 +26,6 @@ const IndexPage = () => {
         })
         .then((data) => {
           setData(data);
-          // setTest(data[String(course)].info['Course Name']);
         })
         .catch((error) => {
           console.log(error);
@@ -39,7 +37,7 @@ const IndexPage = () => {
 
   useEffect(() => {
     const fetchStuff = async () => {
-      await fetch('/api/recommendations/')
+      await fetch('/api/recommendations/' + recfeedbackURL)
         .then((res) => {
           if (res.ok) {
             return res.json();
@@ -48,8 +46,12 @@ const IndexPage = () => {
           }
         })
         .then((data) => {
+          console.log(data);
           setRecs(data);
-          // setTest(data[String(course)].info['Course Name']);
+          if (data.Error) {
+            window.alert('Sorry! your session has expired. Please search for a valid course on the homepage');
+            window.location.href = '/'
+          }
         })
         .catch((error) => {
           console.log(error);
@@ -57,14 +59,18 @@ const IndexPage = () => {
     };
 
     fetchStuff();
-  }, [recommendations]);
+  }, [recfeedbackURL]);
 
   const courseCards: Array<Course> = [];
   
   if (data) {
+
+    if (!data[course]) {
+      window.alert('Error: Sorry this course does not exist in our system. Please search for a valid course on the homepage');
+      window.location.href = '/'
+    }
+
     const sections: Array<Sections> = [];
-    // console.log(data);
-    // console.log(course);
 
     for(let i = 0; i < data[course].sections.length; ++i) {
       const prof: Professor = {
@@ -102,7 +108,7 @@ const IndexPage = () => {
 
   if (recs && data) {
     for (let i = 0; i < 4; ++i) {
-      const temp = recs.at(Math.round(Math.random() * recs.length - 1));
+      const temp = recs.at(i);
 
       const sections: Array<Sections> = [];
       // console.log(data);
@@ -143,9 +149,8 @@ const IndexPage = () => {
 
   //console.log(recCards.length);
 
-  function getRecs(test: string) {
-    console.log(test);
-    //setRecommendations(!recommendations);
+  function getRecs(feedbackURL: string) {
+    setRecFeedbackURL(feedbackURL);
   }
   
   return (
@@ -167,7 +172,7 @@ const IndexPage = () => {
         </Box>
         <Text p={4} fontSize='3xl' ><b>Recommended Similar Courses...</b></Text>
         <Box p={4}>
-          { recommendations && data ?
+          { data ?
             <Grid templateColumns="repeat(4, 1fr)" gap={6}>
               {recCards.map((rec) => (
                 <RecommendationCard

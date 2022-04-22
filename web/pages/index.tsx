@@ -190,9 +190,9 @@ const ClassForm = () => {
               tagVariant='solid'
               colorScheme='gray'
               isMulti
-              onBlur={(event) => {
-                console.log(event.target);
-              }}
+              // onBlur={(event) => {
+              //   console.log(event.target);
+              // }}
               name='prevClasses'
             />
           </FormControl>
