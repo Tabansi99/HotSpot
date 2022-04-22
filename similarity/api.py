@@ -24,7 +24,7 @@ class Feedback(BaseModel):
 #     combined_tags: List[str] = None 
 #     tags: List[Rec] = None 
 
-@app.put("/api/recs/", response_model=Dict[str, Union[List[str], Dict[str, List[str]]]])
+@app.put("/api/recs/", response_model=Dict[str, Union[List[List[str]], Dict[str, List[List[str]]]]])
 async def get_recommendations(fb: Feedback):
 
     _targets = [] if fb.targets is None else fb.targets
@@ -33,16 +33,19 @@ async def get_recommendations(fb: Feedback):
     _neg = [] if fb.neg is None else fb.neg 
     _done = [] if fb.done is None else fb.done 
 
+    def format_score(score):
+        return f'{score*100:.1f}'
+
     return {
         "targets": {
-            t: [repr(c) for c, _ in rec.rec_by_names([t], _pos, _neg, _done)] for t in _targets
+            t: [[repr(c), format_score(score)] for c, score in rec.rec_by_names([t], _pos, _neg, _done)] for t in _targets
         },
         "tags": {
-            t: [repr(c) for c, _ in rec.rec_by_tags([t], _pos, _neg, _done)] for t in _tags
+            t: [[repr(c), format_score(score)] for c, score in rec.rec_by_tags([t], _pos, _neg, _done)] for t in _tags
         },
-        "combined_tags": [repr(c) for c, _ in rec.rec_by_tags(_tags, _pos, _neg, _done)],
-        "combined_targets": [repr(c) for c, _ in rec.rec_by_names(_targets, _pos, _neg, _done)],
-        "all": [repr(c) for c, _ in rec.rec_by_names_and_tags(_targets, _tags, _pos, _neg, _done)]
+        "combined_tags": [[repr(c), format_score(score)] for c, score in rec.rec_by_tags(_tags, _pos, _neg, _done)],
+        "combined_targets": [[repr(c), format_score(score)] for c, score in rec.rec_by_names(_targets, _pos, _neg, _done)],
+        "all": [[repr(c), format_score(score)] for c, score in rec.rec_by_names_and_tags(_targets, _tags, _pos, _neg, _done)]
     } 
 
 

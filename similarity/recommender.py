@@ -98,9 +98,10 @@ def rec_by_tags(target_tags: List[str], pos: List[str] = None, neg: List[str] = 
 
 	# Combine scores
 	combined_scores = defaultdict(float)
-	for c, score in jac_scores:
-		if jac_max - jac_min > 0:
+	for c, score in jac_scores: 
+		if jac_max - jac_min > 0: # Scores are all the same for each class, so no point in adding them?
 			combined_scores[c] += TAG_JAC_WEIGHT*(score - jac_min)/(jac_max - jac_min)
+
 	for c, score in title_scores:
 		if title_max - title_min > 0:
 			combined_scores[c] += TAG_TITLE_WEIGHT*(score - title_min)/(title_max - title_min)
@@ -199,8 +200,8 @@ def _get_title_scores(pool: List[Course], target_items: list):
 				score = sum(WV.similarity(w1, w2) for w2 in w2_words)
 				inner_scores.append(score)
 
-
-			outer_scores.append(sum(inner_scores)/len(inner_scores))
+			if len(inner_scores) > 0:
+				outer_scores.append(sum(inner_scores)/len(inner_scores))
 
 		if len(outer_scores) > 0:
 			class_scores.append((c, (sum(outer_scores)/len(outer_scores))))

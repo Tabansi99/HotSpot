@@ -16,4 +16,3 @@ def test_recommendations():
         }
     )
     print(response.json()['all'])
-    assert(False)
