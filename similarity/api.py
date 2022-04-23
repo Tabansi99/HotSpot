@@ -58,11 +58,12 @@ async def get_recommendations(fb: Feedback):
     } 
 
 
-@app.put("/api/signup/"):
+@app.post("/api/signup/", status_code=201)
 async def signup(s: UserSign):
-    send_signup_email(s.email, s.course)
-    t = Timer(random.randint(30, 60), send_signup_email(s.email, s.course))
+    notif_component.send_signup_email(s.email, s.course)
+    t = Timer(random.randint(30, 60), notif_component.send_signup_email(s.email, s.course))
     t.start() # after 30 seconds, "hello, world" will be printed
+    return {'course': s.course, 'email': s.email}
 
 
 

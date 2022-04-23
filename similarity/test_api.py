@@ -16,3 +16,13 @@ def test_recommendations():
         }
     )
     print(response.json()['all'])
+
+
+def test_notification():
+    response = client.post(
+        '/api/signup/',
+        json={
+            'course': 'CSCE 121',
+            'email': 'jasondraether@gmail.com'
+        }
+    )
