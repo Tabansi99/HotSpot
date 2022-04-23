@@ -1,10 +1,15 @@
 from fastapi import FastAPI, Header, HTTPException, Query
 from pydantic import BaseModel
 from typing import List, Optional, Dict, Union
+import random
 
 import recommender as rec
 from course import format_name
 from dataset import lookup_by_name
+from threading import Timer
+import notif_component
+
+
 
 app = FastAPI()
 
@@ -14,6 +19,10 @@ class Feedback(BaseModel):
     pos: Optional[List[str]] = None 
     neg: Optional[List[str]] = None
     done: Optional[List[str]] = None
+
+class UserSign(BaseModel):
+    course: str
+    email: str
 
 # class Rec(BaseModel):
 #     label: List[str] = None
@@ -47,6 +56,15 @@ async def get_recommendations(fb: Feedback):
         "combined_targets": [[repr(c), format_score(score)] for c, score in rec.rec_by_names(_targets, _pos, _neg, _done)],
         "all": [[repr(c), format_score(score)] for c, score in rec.rec_by_names_and_tags(_targets, _tags, _pos, _neg, _done)]
     } 
+
+
+@app.post("/api/signup/", status_code=201)
+async def signup(s: UserSign):
+    notif_component.send_signup_email(s.email, s.course)
+    t = Timer(random.randint(30, 60), notif_component.send_signup_email(s.email, s.course))
+    t.start() # after 30 seconds, "hello, world" will be printed
+    return {'course': s.course, 'email': s.email}
+
 
 
 # @app.get("/api/{course_major}/{course_id}")
