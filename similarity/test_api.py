@@ -9,10 +9,23 @@ def test_recommendations():
         '/api/recs/',
         json={
             'targets': ['CSCE 431'],
-            'tags': ['Artificial Intelligence'],
-            'pos': ['CSCE 445'],
-            'neg': ['CSCE 443'],
-            'done': ['CSCE 121', 'CSCE 222', 'CSCE 313']
+            'tags': ['Web Development', 'Artificial Intelligence', 'Database'],
+            'pos': [],
+            'neg': [],
+            'done': ['CSCE 121', 'CSCE 221', 'CSCE 222', 'CSCE 313']
         }
     )
+    print('For CSCE 431:')
+    print(response.json()['all'])
+    response = client.put(
+        '/api/recs/',
+        json={
+            'targets': ['CSCE 441'],
+            'tags': ['Web Development', 'Artificial Intelligence', 'Database'],
+            'pos': [],
+            'neg': [],
+            'done': ['CSCE 121', 'CSCE 221', 'CSCE 222', 'CSCE 313']
+        }
+    )
+    print('For CSCE 441:')
     print(response.json()['all'])

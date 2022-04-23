@@ -54,7 +54,8 @@ def _filter_corpus(corpus: List[Course], neg: List[Course]):
 	return [c for c in corpus if (c not in neg)]
 
 def _filter_pool(pool: List[Course], ignored: List[Course], done: List[Course]):
-	return [c for c in pool if ((c not in ignored) and all(p in done for p in c.pre))]
+	done_str = [repr(c) for c in done]
+	return [c for c in pool if ((c not in ignored) and all(p in done_str for p in c.pre))]
 
 def rec_by_names(target_names: List[str], pos: List[str] = None, neg: List[str] = None, done: List[str] = None):
 	# Lookup everything by name, then pass to rec_by_courses

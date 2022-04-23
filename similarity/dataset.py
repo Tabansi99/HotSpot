@@ -40,7 +40,7 @@ def _pull_courses():
 		)
 
 		pre_lookup = doc_dict['Prerequisites']
-		pre = pre_lookup if pre_lookup not in ['non-course related', 'N/A'] else None
+		pre = pre_lookup if (pre_lookup not in ['non-course related', 'N/A']) and ('CSCE' in pre_lookup) else None
 		pre_chain[doc.id] = pre
 
 	pre_store = defaultdict(list)
