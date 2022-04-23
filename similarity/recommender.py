@@ -157,13 +157,19 @@ def rec_by_courses(target_courses: List[Course], pos: List[Course] = None, neg: 
 
 def rec_by_names_and_tags(target_names: List[str], target_tags: List[str], pos: List[str] = None, neg: List[str] = None, done: List[str] = None):
 
-	# Get tag scores 
+	# Get tag scores
 	tag_recs = rec_by_tags(target_tags, pos, neg, done)
-	tag_min, tag_max = min(tag_recs, key=lambda x:x[1])[1], max(tag_recs, key=lambda x:x[1])[1]
+	if len(tag_recs) > 0:
+		tag_min, tag_max = min(tag_recs, key=lambda x:x[1])[1], max(tag_recs, key=lambda x:x[1])[1]
+	else:
+		tag_min, tag_max = 0, 0
 
 	# Get target scores
 	target_recs = rec_by_names(target_names, pos, neg, done)
-	target_min, target_max = min(target_recs, key=lambda x:x[1])[1], max(target_recs, key=lambda x:x[1])[1]
+	if len(target_recs) > 0:
+		target_min, target_max = min(target_recs, key=lambda x:x[1])[1], max(target_recs, key=lambda x:x[1])[1]
+	else:
+		target_min, target_max = 0, 0
 
 	# Combine tag and target scores
 	combined_scores = defaultdict(float)
