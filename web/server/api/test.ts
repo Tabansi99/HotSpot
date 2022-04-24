@@ -8,6 +8,11 @@ const urlencodedParser = bodyParser.urlencoded({ extended: false });
 test.get('/', urlencodedParser, async (req, res) => {
   console.log(req.session);
 
+  // res.send([
+  //   ['CSCE 431', '0.5'],
+  //   ['CSCE 221', 'O.75']
+  // ])
+
   fetch('http://127.0.0.1:8000/api/recs',
     {
       method: 'PUT',

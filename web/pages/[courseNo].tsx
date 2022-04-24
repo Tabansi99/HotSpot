@@ -1,10 +1,11 @@
-import { Box, CircularProgress, CSSReset, Grid, Text } from '@chakra-ui/react';
+import { Box, Button, CircularProgress, CSSReset, Flex, Grid, Input, InputGroup, InputLeftAddon, Link, Modal, ModalCloseButton, ModalContent, ModalHeader, ModalOverlay, Text, useDisclosure } from '@chakra-ui/react';
 import React, { useEffect, useState } from 'react';
 import Layout from '../components/Layout'
 import { Course, CourseCard, Professor, Sections } from '../components/CourseCard';
 import { useRouter } from 'next/router';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { RecommendationCard } from '../components/RecCard';
+import { RecCourse, RecommendationCard } from '../components/RecCard';
+import { Search2Icon } from '@chakra-ui/icons';
 
 const IndexPage = () => {
   const rout = useRouter();
@@ -12,7 +13,10 @@ const IndexPage = () => {
   const course = String(courseNo);
   const [data, setData] = useState<any>();
   const [recs, setRecs] = useState<any>();
+  const [indRecs, setIndRecs] = useState<any>();
   const [recfeedbackURL, setRecFeedbackURL] = useState('');
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const [indivCourse, setIndivCourse] = useState('');
 
   useEffect(() => {
     const fetchStuff = async () => {
@@ -46,7 +50,6 @@ const IndexPage = () => {
           }
         })
         .then((data) => {
-          console.log(data);
           setRecs(data);
           if (data.Error) {
             window.alert('Sorry! your session has expired. Please search for a valid course on the homepage');
@@ -104,17 +107,20 @@ const IndexPage = () => {
     // console.log(data['CSCE 110']);
   }
 
-  const recCards: Array<Course> = [];
+  const recCards: Array<RecCourse> = [];
 
   if (recs && data) {
-    for (let i = 0; i < 4; ++i) {
-      const temp = recs.at(i);
+    let len = 4;
+
+    if (recs.length < 4) {
+      len = recs.length;
+    }
+
+    for (let i = 0; i < len; ++i) {
+      const temp = recs.at(i).at(0);
 
       const sections: Array<Sections> = [];
-      // console.log(data);
-      // console.log(course);
-      // console.log(temp);
-      // console.log(data[temp]);
+      
       for(let i = 0; i < data[temp].sections.length; ++i) {
         const prof: Professor = {
           name: data[temp].sections[i].class['Prof Name'],
@@ -139,6 +145,77 @@ const IndexPage = () => {
 
       recCards.push({
         course: temp,
+        tag: data[temp].Tag,
+        rating: Number(recs.at(i).at(1)),
+        courseName: data[temp].info['Course Name'],
+        courseDescription: data[temp].info['Course Description'],
+        sections: sections,
+        credit: Number(data[temp].info['Course Credit Hours (u)']),
+        feedback: getRecs,
+        recommendations: indivRecs,
+      });
+    }
+  }
+
+  const getIndivRecs = async (courseSelected: string) => {
+    await fetch('/api/recommendations/modal/' + courseSelected)
+      .then((res) => {
+        if (res.ok) {
+          return res.json();
+        } else {
+          throw new Error('Failed');
+        }
+      })
+      .then((data) => {
+        setIndRecs(data);
+        if (data.Error) {
+          window.alert('Sorry! your session has expired. Please search for a valid course on the homepage');
+          window.location.href = '/'
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }
+
+  const indRecCards: Array<Course> = [];
+
+  if (indRecs) {
+    let len = 3;
+
+    if (indRecs.length < 3) {
+      len = indRecs.length;
+    }
+
+    for (let i = 0; i < len; ++i) {
+      const temp = indRecs.at(i).at(0);
+
+      const sections: Array<Sections> = [];
+      
+      for(let i = 0; i < data[temp].sections.length; ++i) {
+        const prof: Professor = {
+          name: data[temp].sections[i].class['Prof Name'],
+          A: data[temp].sections[i].prof['A'],
+          B: data[temp].sections[i].prof['B'],
+          C: data[temp].sections[i].prof['C'],
+          D: data[temp].sections[i].prof['D'],
+          F: data[temp].sections[i].prof['F'],
+          Q: data[temp].sections[i].prof['Q']
+        }
+
+        sections.push({
+          capacity: Number(data[temp].sections[i].class['Max Capacity']),
+          actual: Number(data[temp].sections[i].class['Current Enrollment']),
+          section: Number(data[temp].sections[i].class['Course Section']),
+          days: data[temp].sections[i].class['Class Timing'].DaysOfWeek,
+          start: data[temp].sections[i].class['Class Timing'].BeginTime,
+          stop: data[temp].sections[i].class['Class Timing'].EndTime,
+          professor: prof
+        });
+      }
+
+      indRecCards.push({
+        course: temp,
         courseName: data[temp].info['Course Name'],
         courseDescription: data[temp].info['Course Description'],
         sections: sections,
@@ -147,7 +224,11 @@ const IndexPage = () => {
     }
   }
 
-  //console.log(recCards.length);
+  function indivRecs(courseSelected: string) {
+    setIndivCourse(courseSelected);
+    getIndivRecs(courseSelected);
+    onOpen();
+  }
 
   function getRecs(feedbackURL: string) {
     setRecFeedbackURL(feedbackURL);
@@ -156,6 +237,7 @@ const IndexPage = () => {
   return (
     <Layout>
       <CSSReset />
+      <SearchBar />
       <Box minH={'100vh'} overflow="hidden">
         <Box p={4} align='center'>
           { data ?
@@ -177,20 +259,86 @@ const IndexPage = () => {
               {recCards.map((rec) => (
                 <RecommendationCard
                   key={rec.course + '_key'}
+                  rating={rec.rating}
+                  tag={rec.tag}
                   course={rec.course}
                   courseName={rec.courseName}
                   courseDescription={rec.courseDescription}
                   sections={rec.sections}
                   credit={rec.credit}
-                  feedback={getRecs}
+                  feedback={rec.feedback}
+                  recommendations={rec.recommendations}
                 />
               ))}
             </Grid> :
             <CircularProgress isIndeterminate  size="100px" />
           }
         </Box>
+
+        <Modal isOpen={isOpen} onClose={onClose} isCentered>
+          <ModalOverlay />
+          <ModalContent maxWidth={'1250'} background={''} shadow={'none'}>
+            <ModalHeader textAlign={'center'} color='white' fontSize={'4xl'}>Recomendations for {indivCourse}</ModalHeader>
+            <ModalCloseButton background={'red.500'} onClick={onClose} />
+            { indRecs ?
+              <Box p={4}>
+                <Grid templateColumns="repeat(3, 1fr)">
+                {indRecCards.map((rec) => (
+                  <CourseCard
+                    key={rec.course + '_key'}
+                    course={rec.course}
+                    courseName={rec.courseName}
+                    courseDescription={rec.courseDescription}
+                    sections={rec.sections}
+                    credit={rec.credit}
+                  />
+                ))}
+              </Grid>
+              </Box> :
+              <Flex justify={'center'}>
+                <CircularProgress isIndeterminate  size="100px" />
+              </Flex>
+            }
+          </ModalContent>
+        </Modal>
       </Box>
     </Layout>
+  );
+};
+
+const SearchBar = () => {
+
+  return(
+    <Box mt={-4} mb={4}>
+      <Link
+        href='/'
+        style={{ textDecoration: 'none' }}
+      >
+        <Text color={"#660000"} fontSize="6xl" pb={'-16'}>
+          <b>HotSpot</b>
+        </Text>
+      </Link>
+    
+      <Flex justify={'center'} mt={-12}>      
+        <form action='api/courses/search' method='post'>
+          <InputGroup color={"#660000"} variant='unstyled'>
+            <InputLeftAddon pointerEvents='none' children = {<Search2Icon />} />
+            <p>&emsp;</p>
+            <Input
+              focusBorderColor="#660000"
+              _placeholder={{color: '#A17C73'}}
+              borderColor={'black'}
+              name='course'
+              type="text"
+              color={"#660000"}
+              variant='flushed'
+              placeholder='ex. CSCE 121'
+              required
+            />
+          </InputGroup>
+        </form>
+      </Flex>
+    </Box>
   );
 };
 

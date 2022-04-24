@@ -25,41 +25,10 @@ const IndexPage = () => {
 };
 
 const ClassForm = () => {
-  const [selectedFile, setSelectedFile] = useState<File>();
-  const [fileName, setFileName] = useState('No file chosen');
-  const [course, setCourse] = useState('');
-  const [major, setMajor] = useState('');
-  const formData = new FormData();
-
-  function validateForm(event: React.SyntheticEvent) {
-    sampleCourses.push(course);
-    
-    formData.append('file', selectedFile);
-
-    // fetch(
-    //   '/api/test',
-    //   {
-    //     method: 'POST',
-    //     body: formData,
-    //     // body: JSON.stringify({
-    //     //   course: course,
-    //     //   major: major
-    //     // }),
-    //     redirect: "follow"
-    //   }
-    // )
-    //   .then((res) => res.json())
-    //   .then((res) => {
-    //     console.log('Success: ', res)
-    //   })
-    //   .catch((err) => {
-    //     console.log('Error: ', err);
-    //   })
-  }
 
   return (
     <Box width={400}>
-      <form action='api/courses' onSubmit={validateForm} method='post'>
+      <form action='api/courses' method='post'>
         <Stack>
           <FormControl id="major">
             <FormLabel>What's your major?</FormLabel>
@@ -72,9 +41,6 @@ const ClassForm = () => {
                 name='major'
                 variant='flushed'
                 placeholder='Select Major'
-                onChange={(event) => {
-                  setMajor(event.target.value);
-                }}
                 required
               >
                 <option value='Aerospace Engineering'>Aerospace Engineering</option>
@@ -114,9 +80,6 @@ const ClassForm = () => {
                 color={"#660000"}
                 variant='flushed'
                 placeholder='ex. CSCE 121'
-                onChange={(event) => {
-                  setCourse(event.target.value);
-                }}
                 required
               />
             </InputGroup>

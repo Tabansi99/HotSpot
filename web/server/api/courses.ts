@@ -137,3 +137,22 @@ courses.get('/:course', async (req, res) => {
     });
   }
 });
+
+courses.post('/search', urlencodedParser, async (req, res) => {
+  const { course } = req.body;
+  console.log(req.body);
+
+  req.session.class = course;
+
+  req.session.neg = [];
+  req.session.pos = [];
+
+  res.redirect(`/${course}`)
+});
+
+courses.post('/notification', urlencodedParser, async (req, res) => {
+  // const { course } = req.body;
+  console.log(req.body);
+  return;
+  // res.redirect(`/${course}`)
+});
