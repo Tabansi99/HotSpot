@@ -23,6 +23,7 @@ class Feedback(BaseModel):
 class UserSign(BaseModel):
     course: str
     email: str
+    sections: List[str]
 
 # class Rec(BaseModel):
 #     label: List[str] = None
@@ -60,10 +61,10 @@ async def get_recommendations(fb: Feedback):
 
 @app.post("/api/signup/", status_code=201)
 async def signup(s: UserSign):
-    notif_component.notify_me_email(s.email, s.course)
-    t = Timer(random.randint(30, 60), notif_component.send_signup_email(s.email, s.course))
+    notif_component.notify_me_email(s.email, s.course, s.sections)
+    t = Timer(random.randint(30, 60), notif_component.send_signup_email(s.email, s.course, s.sections))
     t.start() # after 30 seconds, "hello, world" will be printed
-    return {'course': s.course, 'email': s.email}
+    return {'course': s.course, 'email': s.email, 'sections': s.sections}
 
 
 

@@ -22,6 +22,15 @@ def test_notification():
         '/api/signup/',
         json={
             'course': 'CSCE 121',
-            'email': 'jasondraether@gmail.com'
+            'email': 'jasondraether@gmail.com',
+            'sections': []
+        }
+    )
+    response = client.post(
+        '/api/signup/',
+        json={
+            'course': 'CSCE 121',
+            'email': 'jasondraether@gmail.com',
+            'sections': ['571', '543']
         }
     )
