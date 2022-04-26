@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Header, HTTPException, Query
+from fastapi import FastAPI, Header, HTTPException, Query, BackgroundTasks
 from pydantic import BaseModel
 from typing import List, Optional, Dict, Union
 import random
@@ -8,6 +8,7 @@ from course import format_name
 from dataset import lookup_by_name
 from threading import Timer
 import notif_component
+import time
 
 
 
@@ -60,10 +61,9 @@ async def get_recommendations(fb: Feedback):
 
 
 @app.post("/api/signup/", status_code=201)
-async def signup(s: UserSign):
+async def signup(s: UserSign, background_tasks: BackgroundTasks):
     notif_component.notify_me_email(s.email, s.course, s.sections)
-    t = Timer(random.randint(30, 60), notif_component.send_signup_email(s.email, s.course, s.sections))
-    t.start() # after 30 seconds, "hello, world" will be printed
+    background_tasks.add_task(lambda: notif_component.send_signup_email(s.email, s.course, s.sections))
     return {'course': s.course, 'email': s.email, 'sections': s.sections}
 
 
