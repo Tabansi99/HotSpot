@@ -3,7 +3,6 @@ import { Router } from 'express';
 export const recommendations = Router();
 
 recommendations.get('/',async (req, res) => {
-  console.log(req.session);
   if (req.session.class) {
     fetch('http://127.0.0.1:8000/api/recs',
       {
@@ -23,7 +22,6 @@ recommendations.get('/',async (req, res) => {
       .then((res) => res.json())
       .then((resp) => {
         res.send(resp.all);
-        console.log(resp);
       })
       .catch((err) => {
         console.log('Error: ', err);
@@ -111,8 +109,6 @@ recommendations.get('/pos/:course',async (req, res) => {
 
 recommendations.get('/neg/:course',async (req, res) => {
   const { course } = req.params;
-
-  console.log(req.session);
 
   if (req.session.neg) {
     req.session.neg.push(course);

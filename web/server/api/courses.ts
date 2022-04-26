@@ -6,14 +6,9 @@ import bodyParser from 'body-parser';
 export const courses = Router();
 
 const urlencodedParser = bodyParser.urlencoded({ extended: false });
-// console.log('Entered');
+
 courses.post('/', urlencodedParser, async (req, res) => {
   const { major, course, tags, prevClasses } = req.body;
-  console.log(req.body);
-  // console.log(major);
-  // console.log(course);
-  // console.log(tags);
-  // console.log(prevClasses);
 
   req.session.class = course;
   req.session.major = major;
@@ -140,7 +135,6 @@ courses.get('/:course', async (req, res) => {
 
 courses.post('/search', urlencodedParser, async (req, res) => {
   const { course } = req.body;
-  console.log(req.body);
 
   req.session.class = course;
 
@@ -151,8 +145,41 @@ courses.post('/search', urlencodedParser, async (req, res) => {
 });
 
 courses.post('/notification', urlencodedParser, async (req, res) => {
-  // const { course } = req.body;
-  console.log(req.body);
+  const { course, email } = req.body;
+  // console.log(req.body);
+
+  var sectionsSend = []
+
+  if (req.body.sections) {
+    if (!Array.isArray(req.body.sections)) {
+      sectionsSend.push(req.body.sections);
+    }
+    else {
+      sectionsSend = req.body.sections;
+    }
+  }
+
+  fetch('http://127.0.0.1:8000/api/signup',
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        course: course,
+        email: email,
+        sections: sectionsSend
+      })
+    }
+  )
+    .then((res) => res.json())
+    .then((resp) => {
+      console.log(resp);
+    })
+    .catch((err) => {
+      console.log('Error: ', err);
+    });
+
+  res.redirect(`/${req.session.class}`);
   return;
-  // res.redirect(`/${course}`)
 });

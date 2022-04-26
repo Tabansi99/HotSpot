@@ -145,7 +145,7 @@ const IndexPage = () => {
 
       recCards.push({
         course: temp,
-        tag: data[temp].Tag,
+        tag: data[temp].info.Tag,
         rating: Number(recs.at(i).at(1)),
         courseName: data[temp].info['Course Name'],
         courseDescription: data[temp].info['Course Description'],

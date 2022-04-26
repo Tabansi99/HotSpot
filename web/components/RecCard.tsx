@@ -1,5 +1,5 @@
 import { CheckCircleIcon, CheckIcon, InfoIcon, InfoOutlineIcon } from '@chakra-ui/icons';
-import { Alert, AlertIcon, Badge, Box, Button, Checkbox, Collapse, Icon, Input, Link, Modal, ModalBody, ModalCloseButton, ModalContent, ModalHeader, ModalOverlay, Stack, Text, Tooltip, useDisclosure } from '@chakra-ui/react';
+import { Alert, AlertIcon, Badge, Box, Button, Checkbox, Collapse, Flex, FormControl, FormLabel, Icon, Input, Link, Modal, ModalBody, ModalCloseButton, ModalContent, ModalHeader, ModalOverlay, Radio, RadioGroup, Stack, Text, Tooltip, useDisclosure } from '@chakra-ui/react';
 import { useState } from 'react';
 import { IoAlertCircle } from "react-icons/io5";
 import { ProgressBar } from 'react-bootstrap'
@@ -55,7 +55,23 @@ function ratingColor(rate) {
   }
 }
 
-const notify = [];
+const tagMap = new Map();
+tagMap.set('required', 'red');
+tagMap.set('optional', 'gray');
+tagMap.set('Information and Intelligent Systems', 'purple');
+tagMap.set('untracked', 'gray');
+tagMap.set('Systems', 'twitter');
+tagMap.set('Software', 'pink');
+tagMap.set('Algorithms and Theory', 'orange');
+
+const tagNameMap = new Map();
+tagNameMap.set('required', 'Required');
+tagNameMap.set('optional', 'Optional Elective');
+tagNameMap.set('Information and Intelligent Systems', 'Info Systems Elective');
+tagNameMap.set('untracked', 'Optional Elective');
+tagNameMap.set('Systems', 'Systems Elective');
+tagNameMap.set('Software', 'Software Elective');
+tagNameMap.set('Algorithms and Theory', 'Theory Elective');
 
 export const RecommendationCard = ({
   course,
@@ -72,22 +88,12 @@ export const RecommendationCard = ({
   const [isClicked, setIsClicked] = useState(false);
   const [notif, setNotif] = useState('Click to show Grade Distribution');
   const { isOpen, onOpen, onClose } = useDisclosure();
-  
-  
 
   const more = sections.slice(1);
   var available = true;
+  var nosections = false;
 
-  function addClass(classChecked: number) {
-    notify.push(classChecked);
-  }
-
-  function removeClass(classChecked: number) {
-    const temp = notify.indexOf(classChecked);
-    if (temp >= 0) {
-      notify.splice(temp, 1);
-    }
-  }
+  const sects = [];
 
   function gradePercent(grade: number, dist: Professor) {
     const total = dist.A + dist.B + dist.C + dist.D + dist.F + dist.Q;
@@ -100,7 +106,11 @@ export const RecommendationCard = ({
 
     if ((temp.capacity - temp.actual) <= 0) {
       available = false;
+      sects.push(temp.section);
     } 
+    else {
+      nosections = true;
+    }
   }
 
   function changeScene() {
@@ -122,6 +132,12 @@ export const RecommendationCard = ({
           <Badge borderRadius="full" px="3" fontSize={'md'} py='1' colorScheme={ratingColor(rating)}>
             {rating}
           </Badge>
+
+          <Flex justify={'end'} mt='-8'>
+            <Badge borderRadius="full" px="3" fontSize={'md'} py='1' variant={'solid'} colorScheme={tagMap.get(tag)} >
+              {tagNameMap.get(tag)}
+            </Badge>
+          </Flex>
         </Box>
         
         <Text color={"#660000"} fontSize="4xl" as="h1" fontWeight="bold" textAlign={'center'}>
@@ -217,7 +233,7 @@ export const RecommendationCard = ({
           <Link borderRadius='100'><Icon as={RiCloseCircleFill} boxSize={'10'} onClick={() => {feedback(`neg/${course}`)}}/></Link>
         </Text>
 
-        <Box textAlign={'center'}>
+        <Box mt={'2'} textAlign={'center'}>
           <Button
             color={"black"}
             background='yellow.200'
@@ -233,43 +249,91 @@ export const RecommendationCard = ({
 
       <Modal isOpen={isOpen} onClose={onClose} isCentered>
         <ModalOverlay />
-        <ModalContent>
+        <ModalContent >
           <ModalHeader textAlign={'center'} >Notification Information</ModalHeader>
           <ModalCloseButton background={'red.500'} onClick={onClose} />
           <Box>
-            <form method='post' action='api/courses/notification'>
-              <ModalBody>
-                <Stack spacing={4}>
-                  <Box>
-                    <Text>
-                      Which section would you like to be notiified for?
-                    </Text>
-                    {sections.map((sect) => (
-                      <Text as={'b'}>
-                        &emsp; <Checkbox
-                        onChange={(event) => {
-                          if (event.target.checked) {
-                            addClass(sect.section);
-                          }
-                          else{
-                            removeClass(sect.section);
-                          }
-                          console.log(notify);
-                        }}/> {sect.section}
-                      </Text>
-                    ))}
+            <ModalBody mb='2'>
+              { nosections ?
+                <Box>
+                  <Text as='b' fontSize={'md'}>Would you like to register for the open section ?</Text>
+                  <Box textAlign={'center'}>
+                    <Link
+                      target="_blank"
+                      style={{ textDecoration: 'none' }}
+                      href='https://compassxe-ssb.tamu.edu/StudentRegistrationSsb/ssb/registration'
+                    >
+                      <Button
+                        bg={'#660000'}
+                        color={'white'}
+                        _hover={{
+                          bg: 'red.600',
+                        }}
+                        mt={2}
+                        width="72"
+                        p={5}
+                        borderColor={'black'}
+                        borderWidth='thick'
+                        borderRadius={15}
+                      >
+                        Register
+                      </Button>
+                    </Link>
                   </Box>
-                  <Box hidden><Input type={'text'} name='sections' value={notify}/></Box>
-                  <Button type='submit'>Test</Button>
+                  <Text textAlign={'center'} p='4' fontSize={'2xl'} fontWeight='bold'> OR </Text>
+                </Box>
+                : ''
+              }
+              <form method='post' action='api/courses/notification'>
+                <Stack spacing={4}>
+                  <Text as='b' fontSize={'md'}>Be notified when sections for {course} become available</Text>
+                  <Input name='course' value={course} hidden/>
+                  
+                  <FormControl>
+                    <FormLabel>
+                      Would you like to be notiified for a specific section?
+                    </FormLabel>
+                    <Stack>
+                      { sects.map((s) => (
+                        <Checkbox name='sections' value={s}>{s}</Checkbox>
+                      ))}
+                    </Stack>
+                  </FormControl>
+
+                  <FormControl>
+                    <FormLabel>
+                      Please provide an email for the notification
+                    </FormLabel>
+                    <Input name='email' type='email' borderColor={'maroon'} borderWidth='medium' required/>
+                  </FormControl>
+
+                  <Box textAlign={'center'}>
+                    <Button
+                      type="submit"
+                      bg={'#660000'}
+                      color={'white'}
+                      _hover={{
+                        bg: 'red.600',
+                      }}
+                      mt={2}
+                      width="72"
+                      p={5}
+                      borderColor={'black'}
+                      borderWidth='thick'
+                      borderRadius={15}
+                    >
+                      Notify Me
+                    </Button>
+                  </Box>
                 </Stack>
-              </ModalBody>
-            </form>
+              </form>
+            </ModalBody>
           </Box>
         </ModalContent>
       </Modal>
 
       { sections.length > 0 ?
-        <Box p={4} textAlign={'center'}>
+        <Box pb={4} textAlign={'center'}>
           { available ? 
             <Link
               target="_blank"
@@ -277,13 +341,12 @@ export const RecommendationCard = ({
               href='https://compassxe-ssb.tamu.edu/StudentRegistrationSsb/ssb/registration'
             >
               <Button
-                type="submit"
                 bg={'#660000'}
                 color={'white'}
                 _hover={{
                   bg: 'red.600',
                 }}
-                mt={4}
+                mt={2}
                 width="72"
                 p={5}
                 borderColor={'black'}
@@ -295,14 +358,13 @@ export const RecommendationCard = ({
             </Link>
             :
             <Button
-              type="submit"
               bg={'#660000'}
               color={'white'}
               onClick={onOpen}
               _hover={{
                 bg: 'red.600',
               }}
-              mt={4}
+              mt={2}
               width="72"
               p={5}
               borderColor={'black'}
@@ -313,20 +375,19 @@ export const RecommendationCard = ({
             </Button>
           }
         </Box> :
-        <Box p={4} textAlign={'center'}>
+        <Box pb={4} textAlign={'center'}>
           <Link
             target="_blank"
             style={{ textDecoration: 'none' }}
           >
             <Button
-              type="submit"
               bg={'#660000'}
               color={'white'}
               _hover={{
                 bg: '#660000',
               }}
               disabled
-              mt={4}
+              mt={2}
               width="72"
               p={5}
               borderColor={'black'}
