@@ -1,4 +1,4 @@
-import { Box, Button, CircularProgress, CSSReset, Flex, Grid, Input, InputGroup, InputLeftAddon, Link, Modal, ModalCloseButton, ModalContent, ModalHeader, ModalOverlay, Text, useDisclosure } from '@chakra-ui/react';
+import { Accordion, AccordionButton, AccordionIcon, AccordionItem, AccordionPanel, Box, Button, CircularProgress, CSSReset, Flex, Grid, Input, InputGroup, InputLeftAddon, Link, Modal, ModalCloseButton, ModalContent, ModalHeader, ModalOverlay, Text, useDisclosure } from '@chakra-ui/react';
 import React, { useEffect, useState } from 'react';
 import Layout from '../components/Layout'
 import { Course, CourseCard, Professor, Sections } from '../components/CourseCard';
@@ -17,6 +17,10 @@ const IndexPage = () => {
   const [recfeedbackURL, setRecFeedbackURL] = useState('');
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [indivCourse, setIndivCourse] = useState('');
+  const [taken, setTaken] = useState<String[]>([]);
+  const [positive, setPositive] = useState<String[]>([]);
+  const [negative, setNegative] = useState<String[]>([]);
+  const [searchTags, setSearchTags] = useState<String[]>([]);
 
   useEffect(() => {
     const fetchStuff = async () => {
@@ -55,6 +59,24 @@ const IndexPage = () => {
             window.alert('Sorry! your session has expired. Please search for a valid course on the homepage');
             window.location.href = '/'
           }
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+
+        await fetch('/api/courses/session')
+        .then((res) => {
+          if (res.ok) {
+            return res.json();
+          } else {
+            throw new Error('Failed');
+          }
+        })
+        .then((data) => {
+          setTaken(data.done);
+          setPositive(data.pos);
+          setNegative(data.neg);
+          setSearchTags(data.tags);
         })
         .catch((error) => {
           console.log(error);
@@ -238,19 +260,73 @@ const IndexPage = () => {
     <Layout>
       <CSSReset />
       <SearchBar />
-      <Box minH={'100vh'} overflow="hidden">
-        <Box p={4} align='center'>
-          { data ?
-            <CourseCard
-              key={1}
-              course={courseCards.at(0).course}
-              courseName={courseCards.at(0).courseName}
-              courseDescription={courseCards.at(0).courseDescription}
-              sections={courseCards.at(0).sections}
-              credit={courseCards.at(0).credit}
-            /> :
-            <CircularProgress isIndeterminate  size="100px" />
-          }
+      <Box p='4' minH={'100vh'} overflow="hidden">
+        <Box>
+          <Box position={'fixed'} display={'inline-flex'} textAlign={'left'} background="white" w={"sm"} borderWidth="1px" borderRadius="3xl" overflow="hidden" shadow={"xl"}>
+            <Accordion allowMultiple allowToggle w={"sm"} p='4'>
+              <Text textAlign={'center'} fontWeight='bold' color={"#660000"}>USER SESSION INFORMATION</Text>
+              <AccordionItem>
+                <AccordionButton>
+                  <Box flex={'1'} fontWeight='bold' fontSize={'lg'} textAlign='left'>
+                    Courses Taken: 
+                  </Box>
+                  <AccordionIcon />
+                </AccordionButton>
+                <AccordionPanel>
+                  <Text fontSize={'md'}>{taken.sort().toString().replaceAll(',',', ')}</Text>
+                </AccordionPanel>
+              </AccordionItem>
+
+              <AccordionItem>
+                <AccordionButton>
+                  <Box flex={'1'} fontWeight='bold' fontSize={'lg'} textAlign='left'>
+                    Search Topics: 
+                  </Box>
+                  <AccordionIcon />
+                </AccordionButton>
+                <AccordionPanel>
+                  <Text fontSize={'md'}>{searchTags.sort().toString().replaceAll(',',', ')}</Text>
+                </AccordionPanel>
+              </AccordionItem>
+
+              <AccordionItem>
+                <AccordionButton>
+                  <Box flex={'1'} fontWeight='bold' fontSize={'lg'} textAlign='left'>
+                    Positive Feedback: 
+                  </Box>
+                  <AccordionIcon />
+                </AccordionButton>
+                <AccordionPanel>
+                  <Text fontSize={'md'}>{positive.sort().toString().replaceAll(',',', ')}</Text>
+                </AccordionPanel>
+              </AccordionItem>
+
+              <AccordionItem>
+                <AccordionButton>
+                  <Box flex={'1'} fontWeight='bold' fontSize={'lg'} textAlign='left'>
+                    Negative Feedback: 
+                  </Box>
+                  <AccordionIcon />
+                </AccordionButton>
+                <AccordionPanel>
+                  <Text fontSize={'md'}>{negative.sort().toString().replaceAll(',',', ')}</Text>
+                </AccordionPanel>
+              </AccordionItem>
+            </Accordion>
+          </Box>
+          <Box p={4} align='center'>
+            { data ?
+              <CourseCard
+                key={1}
+                course={courseCards.at(0).course}
+                courseName={courseCards.at(0).courseName}
+                courseDescription={courseCards.at(0).courseDescription}
+                sections={courseCards.at(0).sections}
+                credit={courseCards.at(0).credit}
+              /> :
+              <CircularProgress isIndeterminate  size="200px" />
+            }
+          </Box>
         </Box>
         <Text p={4} fontSize='3xl' ><b>Recommended Similar Courses...</b></Text>
         <Box p={4}>
@@ -271,7 +347,7 @@ const IndexPage = () => {
                 />
               ))}
             </Grid> :
-            <CircularProgress isIndeterminate  size="100px" />
+            <CircularProgress isIndeterminate  size='200px' />
           }
         </Box>
 

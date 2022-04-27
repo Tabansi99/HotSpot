@@ -81,6 +81,22 @@ courses.get('/', async (_req , res) => {
   res.send(course);
 });
 
+courses.get('/session', (req, res) => {
+  if (req.session) {
+    res.send({
+      done: req.session.prevClasses,
+      pos: req.session.pos,
+      neg: req.session.neg,
+      tags: req.session.tags
+    });
+    return;
+  }
+
+  res.send({
+    Error: 'No Active Session'
+  })
+});
+
 courses.get('/:course', async (req, res) => {
   const { course } = req.params;
 
